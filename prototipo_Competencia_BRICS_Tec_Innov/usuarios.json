@@ -1,0 +1,12 @@
+[
+    {
+        "usuario": "doc_ramon",
+        "clave": "clave123",
+        "rol": "profesional"
+    },
+    {
+        "usuario": "juanp",
+        "clave": "clave456",
+        "rol": "paciente"
+    }
+]
