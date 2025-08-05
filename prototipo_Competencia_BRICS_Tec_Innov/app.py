@@ -1,66 +1,82 @@
 from flask import Flask, render_template, request, redirect, session
-import json
+import json, os
+from datetime import datetime
 from blockchain import Blockchain
-import hashlib
 
 app = Flask(__name__)
-app.secret_key = 'secreto'
-bc = Blockchain()
+app.secret_key = 'clave_secreta'
 
+blockchain = Blockchain()
 
 def cargar_usuarios():
-    with open("usuarios.json", "r") as f:
+    if not os.path.exists('usuarios.json'):
+        return []
+    with open('usuarios.json', 'r') as f:
         return json.load(f)
 
-def firmar(usuario, clave):
-    return hashlib.sha256(f"{usuario}:{clave}".encode()).hexdigest()
+def guardar_usuarios(usuarios):
+    with open('usuarios.json', 'w') as f:
+        json.dump(usuarios, f, indent=2)
 
-@app.route('/')
-def inicio():
-    if 'usuario' in session:
-        return redirect('/registro')
-    return render_template('index.html')
-
-@app.route('/login', methods=['POST'])
+@app.route("/", methods=["GET", "POST"])
 def login():
-    usuario = request.form['usuario']
-    clave = request.form['clave']
+    if request.method == "POST":
+        usuario = request.form["usuario"]
+        clave = request.form["clave"]
+        usuarios = cargar_usuarios()
+        for u in usuarios:
+            if u["usuario"] == usuario and u["clave"] == clave:
+                session["usuario"] = u["usuario"]
+                session["roles"] = u.get("roles", [u.get("rol")])
+                return redirect("/seleccionar_rol")
+        return "Credenciales incorrectas"
+    return render_template("login.html")
+
+@app.route("/seleccionar_rol")
+def seleccionar_rol():
+    if "usuario" not in session or "roles" not in session:
+        return redirect("/")
+    return render_template("seleccionar_rol.html", roles=session["roles"])
+
+@app.route("/panel_paciente")
+def panel_paciente():
+    if "usuario" not in session or "paciente" not in session["roles"]:
+        return redirect("/")
     usuarios = cargar_usuarios()
-    for u in usuarios:
-        if u["usuario"] == usuario and u["clave"] == clave:
-            session['usuario'] = usuario
-            session['rol'] = u["rol"]
-            session['clave'] = clave
-            return redirect('/registro')
-    return "Login incorrecto"
+    usuario = next((u for u in usuarios if u["usuario"] == session["usuario"]), {})
+    return render_template("panel_paciente.html", usuario=usuario)
 
-@app.route('/registro', methods=['GET', 'POST'])
-def registro():
-    if 'usuario' not in session:
-        return redirect('/')
+@app.route("/panel_profesional")
+def panel_profesional():
+    if "usuario" not in session or "profesional" not in session["roles"]:
+        return redirect("/")
+    return render_template("panel_profesional.html")
 
-    if request.method == 'POST':
-        paciente = request.form['paciente']
-        descripcion = request.form['descripcion']
-        firma = firmar(session['usuario'], session['clave'])
+@app.route("/registrar_observacion", methods=["GET", "POST"])
+def registrar_observacion():
+    if "usuario" not in session or "profesional" not in session["roles"]:
+        return redirect("/")
+
+    usuarios = cargar_usuarios()
+    pacientes = [
+    {"usuario": u["usuario"], "dni": u["dni"]}
+    for u in usuarios if "paciente" in u.get("roles", [])
+]
+
+    if request.method == "POST":
         data = {
-            "paciente": paciente,
-            "profesional": session['usuario'],
-            "descripcion": descripcion
+            "profesional": session["usuario"],
+            "paciente": request.form["paciente"],
+            "sintomas": request.form["sintomas"],
+            "diagnostico": request.form["diagnostico"],
+            "lugar": request.form["lugar"],
+            "notas": request.form["notas"],
+            "fecha": datetime.now().isoformat()
         }
-        bc.agregar_bloque(data, firma)
-        return redirect('/cadena')
+        blockchain.agregar_bloque(data)
+        return redirect("/panel_profesional")
 
-    return render_template('registro.html', usuario=session['usuario'], rol=session['rol'])
+    return render_template("registrar_observacion.html", pacientes=pacientes)
 
-@app.route('/cadena')
-def ver_cadena():
-    return render_template('cadena.html', bloques=bc.cadena, valida=bc.es_valida())
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect('/')
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

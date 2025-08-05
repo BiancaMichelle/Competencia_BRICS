@@ -1,0 +1,6 @@
+<h2>Selecciona tu rol</h2>
+<ul>
+  {% for rol in roles %}
+    <li><a href="/panel_{{ rol }}">{{ rol | capitalize }}</a></li>
+  {% endfor %}
+</ul>

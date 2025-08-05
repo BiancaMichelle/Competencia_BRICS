@@ -1,12 +1,31 @@
 [
-    {
-        "usuario": "doc_ramon",
-        "clave": "clave123",
-        "rol": "profesional"
-    },
-    {
-        "usuario": "juanp",
-        "clave": "clave456",
-        "rol": "paciente"
-    }
+  {
+    "usuario": "juan.perez",
+    "nombre": "Juan Pérez",
+    "dni": "12345678",
+    "roles": ["paciente", "profesional"]
+  },
+  {
+    "usuario": "maria.lopez",
+    "nombre": "María López",
+    "dni": "87654321",
+    "roles": ["paciente"]
+  },
+  {
+    "usuario": "carlos.mendez",
+    "nombre": "Carlos Méndez",
+    "dni": "45678912",
+    "roles": ["paciente"]
+  },
+  {
+    "usuario": "medico.gomez",
+    "nombre": "Dra. Gómez",
+    "dni": "11223344",
+    "roles": ["profesional"]
+  },
+  {
+    "usuario": "paciente.sin.dni",
+    "nombre": "Paciente sin DNI",
+    "roles": ["paciente"]
+  }
 ]

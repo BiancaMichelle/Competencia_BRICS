@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registrar Observación Médica</title>
+
+    <!-- Estilos y scripts de Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#paciente').select2({
+                placeholder: "Buscar paciente por DNI...",
+                allowClear: true
+            });
+        });
+    </script>
+</head>
+<body>
+    <h2>Registrar Observación Médica</h2>
+
+    <form method="post">
+        <label for="paciente">Seleccionar paciente:</label><br>
+        <select name="paciente" id="paciente" required style="width: 300px;">
+            <option></option> <!-- Placeholder -->
+            {% for p in pacientes %}
+                <option value="{{ p.usuario }}">{{ p.dni }} - {{ p.usuario }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label>Síntomas:</label><br>
+        <textarea name="sintomas" required></textarea><br><br>
+
+        <label>Diagnóstico / Enfermedad:</label><br>
+        <input type="text" name="diagnostico" required><br><br>
+
+        <label>Lugar de atención:</label><br>
+        <input type="text" name="lugar" required><br><br>
+
+        <label>Notas adicionales:</label><br>
+        <textarea name="notas"></textarea><br><br>
+
+        <button type="submit">Registrar en historial</button>
+    </form>
+</body>
+</html>
