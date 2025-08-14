@@ -97,8 +97,9 @@ def panel_profesional():
 
 @app.route("/logout")
 def logout():
-    session.clear()
-    return redirect(url_for("login"))
+    session.clear()  # Limpiar toda la sesión
+    flash("Has cerrado sesión correctamente.", "info")
+    return redirect(url_for("login"))  # Redirigir al login
 
 if __name__ == "__main__":
     app.run(debug=True)
