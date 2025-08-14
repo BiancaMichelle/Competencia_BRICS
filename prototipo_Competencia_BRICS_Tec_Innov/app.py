@@ -67,6 +67,7 @@ def login():
             # Guardar en sesión
             session["usuario"] = user["usuario"]
             session["roles"] = user["roles"]
+            session["nombre_medico"] = user["nombre"]  # Guardamos el nombre
             flash(f"¡Bienvenido {user['usuario']}!", "success")
 
             # Redirigir según rol
@@ -93,7 +94,35 @@ def panel_profesional():
         return redirect(url_for("login"))
     if "profesional" not in session["roles"]:
         return "Acceso denegado"
-    return render_template("panel_profesional.html", usuario=session["usuario"])
+    nombre_medico = session.get("nombre_medico", "Médico")  # si no está en sesión, usa "Médico"
+    return render_template("panel_profesional.html", nombre_medico=nombre_medico)
+
+import json
+from flask import jsonify
+
+@app.route("/api/pacientes")
+def api_pacientes():
+    usuarios = cargar_usuarios()
+    pacientes_resumen = []
+    for u in usuarios:
+        if "paciente" in u.get("roles", []):
+            pacientes_resumen.append({
+                "id": u.get("id"),
+                "nombre": u.get("nombre"),
+                "ci": u.get("ci"),
+                # Usamos el último diagnóstico como enfermedad actual
+                "enfermedad_actual": u.get("diagnosticos", [])[-1] if u.get("diagnosticos") else "No especificada"
+            })
+    return jsonify(pacientes_resumen)
+
+# Detalle completo de un paciente
+@app.route("/api/pacientes/<int:paciente_id>")
+def api_paciente_detalle(paciente_id):
+    usuarios = cargar_usuarios()
+    paciente = next((u for u in usuarios if u.get("id") == paciente_id), None)
+    if not paciente:
+        return jsonify({"error": "Paciente no encontrado"}), 404
+    return jsonify(paciente)
 
 @app.route("/logout")
 def logout():

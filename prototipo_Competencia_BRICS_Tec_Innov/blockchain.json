@@ -4,5 +4,23 @@
         "timestamp": 1755148767.1685274,
         "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
         "hash": "3893a60eaefaf25408d51cec225a58af4a40fb9b84cc7a2f86de45abf1478fe1"
+    },
+    {
+        "usuario": "maria.lopez",
+        "timestamp": 1755171034.4942744,
+        "previous_hash": "3893a60eaefaf25408d51cec225a58af4a40fb9b84cc7a2f86de45abf1478fe1",
+        "hash": "4aae1bf4f951e5a2c82dd8c3eefbd82dd20d503dfe95260e1b0a8392870c1918"
+    },
+    {
+        "usuario": "medico.gomez",
+        "timestamp": 1755171182.5935817,
+        "previous_hash": "4aae1bf4f951e5a2c82dd8c3eefbd82dd20d503dfe95260e1b0a8392870c1918",
+        "hash": "6893f46c851016afafd98b1300f2f8c2634283ef71883735166477c651dad59b"
+    },
+    {
+        "usuario": "medico.gomez",
+        "timestamp": 1755172448.220154,
+        "previous_hash": "6893f46c851016afafd98b1300f2f8c2634283ef71883735166477c651dad59b",
+        "hash": "db6434d9b1fde690950de31ceac30ff017227c248ab2d52c4b5b3e379c62998b"
     }
 ]

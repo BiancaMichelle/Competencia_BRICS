@@ -52,7 +52,7 @@
         
         <!-- Vista de Inicio (visible por defecto) -->
         <div id="inicio-view" class="bg-white p-8 rounded-2xl shadow-lg">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">Bienvenido, Dr. [Nombre del Médico]</h1>
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Bienvenido, Dr. {{ nombre_medico }}</h1>
             <p class="text-gray-600 mb-8">
                 Aquí tienes un resumen rápido de tu agenda y pacientes.
             </p>
@@ -157,7 +157,7 @@
                     class="w-full p-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="patients-list-container">
-                <!-- La lista de pacientes se generará con JavaScript -->
+                
             </div>
         </div>
 
@@ -187,231 +187,171 @@
 
     <!-- Script para funcionalidad interactiva y datos -->
     <script>
-        // Datos de ejemplo para los pacientes
-        const patientsData = [
-            {
-                id: 1,
-                name: 'Juan Pérez',
-                ci: '1122334-5',
-                bloodType: 'O+',
-                currentIllness: 'Diabetes tipo 2',
-                condition: 'Hipertensión',
-                allergies: 'Penicilina',
-                history: {
-                    physicalExams: [
-                        { date: '10/05/2024', observations: 'Presión arterial 130/85 mmHg, peso 85 kg, altura 1.75 m. Examen físico general sin hallazgos relevantes.' },
-                        { date: '05/01/2024', observations: 'Presión arterial 135/90 mmHg, peso 86 kg. Se observan ligeros edemas en tobillos.' }
-                    ],
-                    labTests: [
-                        { date: '10/05/2024', test: 'Hemograma completo', results: 'Glucosa 130 mg/dL, Colesterol total 210 mg/dL, Triglicéridos 160 mg/dL.' },
-                        { date: '05/01/2024', test: 'Análisis de orina', results: 'Presencia de proteínas en orina.' }
-                    ],
-                    treatments: [
-                        { date: '10/05/2024', treatment: 'Ajuste de dosis de Metformina. Inicio de dieta baja en sodio.' },
-                        { date: '05/01/2024', treatment: 'Metformina 500mg, Amlodipina 5mg. Dieta balanceada.' }
-                    ],
-                    symptoms: [
-                        { date: '10/05/2024', symptom: 'Fatiga persistente, sed excesiva.' },
-                        { date: '05/01/2024', symptom: 'Micción frecuente.' }
-                    ],
-                    diagnosis: [
-                        { date: '10/05/2024', diagnosis: 'Diabetes tipo 2, descontrolada.' }
-                    ],
-                    additionalNotes: [
-                        { date: '10/05/2024', note: 'Viaje reciente a la costa, posible cambio en la dieta.' }
-                    ]
-                }
-            },
-            {
-                id: 2,
-                name: 'María López',
-                ci: '2233445-6',
-                bloodType: 'A-',
-                currentIllness: 'Asma',
-                condition: 'Ninguna',
-                allergies: 'Polen',
-                history: {
-                    physicalExams: [
-                        { date: '20/06/2024', observations: 'Ausencia de sibilancias, saturación de oxígeno 98%. Auscultación pulmonar sin anormalidades.' }
-                    ],
-                    labTests: [],
-                    treatments: [
-                        { date: '20/06/2024', treatment: 'Inhalador de salbutamol para rescate. Control anual de la función pulmonar.' }
-                    ],
-                    symptoms: [
-                        { date: '20/06/2024', symptom: 'Sibilancias ocasionales, dificultad para respirar al hacer ejercicio.' }
-                    ],
-                    diagnosis: [
-                        { date: '20/06/2024', diagnosis: 'Asma leve persistente.' }
-                    ],
-                    additionalNotes: []
-                }
-            },
-             {
-                id: 3,
-                name: 'Pedro Ramírez',
-                ci: '3344556-7',
-                bloodType: 'B+',
-                currentIllness: 'Gastritis',
-                condition: 'Sin alergias',
-                allergies: 'Ninguna',
-                history: {
-                    physicalExams: [
-                        { date: '12/07/2024', observations: 'Presión arterial 120/80 mmHg, peso 70 kg. Abdomen blando, dolor epigástrico a la palpación.' }
-                    ],
-                    labTests: [
-                        { date: '12/07/2024', test: 'Endoscopia', results: 'Inflamación de la mucosa gástrica.' }
-                    ],
-                    treatments: [
-                        { date: '12/07/2024', treatment: 'Omeprazol 20mg (1 cápsula al día). Dieta blanda.' }
-                    ],
-                    symptoms: [
-                        { date: '12/07/2024', symptom: 'Dolor en el estómago, ardor, náuseas.' }
-                    ],
-                    diagnosis: [
-                        { date: '12/07/2024', diagnosis: 'Gastritis aguda.' }
-                    ],
-                    additionalNotes: [
-                        { date: '12/07/2024', note: 'Ha estado comiendo comida muy picante.' }
-                    ]
-                }
-            }
-        ];
-        
-        // Datos de ejemplo para los turnos agendados
+        /* =========================
+        Estado global
+        ========================= */
+        let pacientesResumen = [];           // /api/pacientes
+        const detalleCache = {};            // cache por id { [id]: pacienteDetalle }
         let scheduledAppointments = [
-             { date: '2024-10-25', time: '09:00', patientName: 'Lic. María Solís', specialty: 'Nutricionista' },
-             { date: '2024-10-15', time: '10:30', patientName: 'Dra. Ana Gómez', specialty: 'Dermatóloga' },
-             { date: '2024-10-15', time: '16:00', patientName: 'Dr. Javier Pérez', specialty: 'Cardiólogo' }
+            { date: '2024-10-25', time: '09:00', patientName: 'Lic. María Solís', specialty: 'Nutricionista' },
+            { date: '2024-10-15', time: '10:30', patientName: 'Dra. Ana Gómez', specialty: 'Dermatóloga' },
+            { date: '2024-10-15', time: '16:00', patientName: 'Dr. Javier Pérez', specialty: 'Cardiólogo' }
         ];
-
         let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
-        let selectedDay = null;
+        let currentYear  = new Date().getFullYear();
+        let selectedDay  = null;
 
-        // Función para mostrar la vista correcta y ocultar las demás
+        /* =========================
+        Navegación entre vistas
+        ========================= */
         function showView(viewId) {
             const views = ['inicio-view', 'turnos-view', 'pacientes-view', 'detalle-paciente-view'];
-            views.forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-            });
+            views.forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById(viewId).classList.remove('hidden');
 
-            // Renderizar datos específicos de la vista si es necesario
-            if (viewId === 'turnos-view') {
-                renderCalendar();
-            } else if (viewId === 'pacientes-view') {
-                renderPatientsList();
-            }
+            if (viewId === 'turnos-view') renderCalendar();
+            if (viewId === 'pacientes-view') renderPacientes(pacientesResumen);
         }
-        
-        // Función para renderizar la lista de pacientes
-        function renderPatientsList(filteredPatients = patientsData) {
-            const container = document.getElementById('patients-list-container');
-            container.innerHTML = ''; // Limpiar el contenedor
 
-            if (filteredPatients.length === 0) {
-                 container.innerHTML = `<p class="text-gray-500 text-center col-span-full">No se encontraron pacientes.</p>`;
-                 return;
+        /* =========================
+        Lista principal de pacientes
+        (DNI + enfermedad actual)
+        ========================= */
+        function renderPacientes(lista) {
+            const container = document.getElementById("patients-list-container");
+            container.innerHTML = "";
+
+            if (!lista || lista.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center col-span-full">No se encontraron pacientes.</p>`;
+                return;
             }
 
-            filteredPatients.forEach(patient => {
-                const card = document.createElement('div');
-                card.className = 'bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md cursor-pointer hover:bg-gray-100 transition-colors duration-200';
-                card.onclick = () => showPatientDetails(patient.id);
+            lista.forEach(p => {
+                const card = document.createElement("div");
+                card.className = "bg-gray-100 p-4 rounded-lg shadow cursor-pointer hover:bg-gray-200 transition";
+                card.onclick = () => showPatientDetails(p.id);
                 card.innerHTML = `
-                    <h3 class="text-xl font-bold text-blue-800">${patient.name}</h3>
-                    <p class="text-gray-700">C.I.: ${patient.ci}</p>
-                    <p class="text-gray-700">Enfermedad actual: <span class="font-semibold text-red-600">${patient.currentIllness}</span></p>
+                    <p><strong>C.I.:</strong> ${p.ci || "No registrado"}</p>
+                    <p><strong>Enfermedad actual:</strong> ${p.enfermedad_actual || "No especificada"}</p>
                 `;
                 container.appendChild(card);
             });
         }
-        
-        // Función para mostrar los detalles de un paciente específico
+
+        /* =========================
+        Cargar detalle de paciente
+        ========================= */
         function showPatientDetails(patientId) {
-            const patient = patientsData.find(p => p.id === patientId);
-            if (!patient) {
-                console.error('Paciente no encontrado');
+            // Usa cache si ya lo tenemos
+            if (detalleCache[patientId]) {
+                renderDetalle(detalleCache[patientId]);
                 return;
             }
+            fetch(`/api/pacientes/${patientId}`)
+                .then(r => r.json())
+                .then(p => {
+                    if (p.error) throw new Error(p.error);
+                    detalleCache[patientId] = p; // guardo en cache
+                    renderDetalle(p);
+                })
+                .catch(err => console.error("Error cargando detalle del paciente:", err));
+        }
 
-            document.getElementById('patient-details-name').textContent = `Historial de ${patient.name}`;
+        /* Helpers para formatear listas (acepta strings u objetos) */
+        function liFromItem(item, campos = []) {
+            // Si es string, mostrar como está
+            if (typeof item === 'string') return `<li>${item}</li>`;
+            // Si es objeto, intentar armar "fecha: texto" o concatenar campos
+            const fecha = item.fecha || item.date || "";
+            const texto = item.texto || item.descripcion || item.sintoma || item.observaciones || item.resultados || item.diagnostico || "";
+            if (fecha || texto) return `<li>${fecha ? `<strong>${fecha}:</strong> ` : ""}${texto}</li>`;
+            // Fallback: concatenar campos pedidos (si existen)
+            const joined = campos.map(c => item[c]).filter(Boolean).join(" - ");
+            return `<li>${joined || "—"}</li>`;
+        }
+        function ulFromArray(arr, campos = []) {
+            if (!Array.isArray(arr) || arr.length === 0) {
+                return `<ul class="list-disc list-inside text-gray-500"><li>Sin datos</li></ul>`;
+            }
+            return `<ul class="list-disc list-inside space-y-2 text-gray-700">
+                ${arr.map(it => liFromItem(it, campos)).join('')}
+            </ul>`;
+        }
+
+        /* Render del detalle (usa claves nuevas del backend) */
+        function renderDetalle(patient) {
+            // Mapea claves esperadas
+            const nombre      = patient.nombre || patient.name || "Sin nombre";
+            const ci          = patient.ci || "No registrado";
+            const tipoSangre  = patient.tipo_sangre || patient.bloodType || "Desconocido";
+
+            // Secciones (acepta string[] u objeto[])
+            const sintomas            = patient.sintomas || [];
+            const diagnosticos        = patient.diagnosticos || [];
+            const examenes_fisicos    = patient.examenes_fisicos || [];
+            const analisis_laboratorio= patient.analisis_laboratorio || [];
+            const tratamientos        = patient.tratamientos || [];
+            const notas_adicionales   = patient.notas_adicionales || patient.historial || [];
+
+            document.getElementById('patient-details-name').textContent = `Historial de ${nombre}`;
+
             const container = document.getElementById('patient-info-container');
             container.innerHTML = `
                 <div class="mb-8">
                     <h2 class="text-2xl font-semibold text-gray-800 mb-4">Datos Principales</h2>
                     <div class="p-6 bg-gray-50 rounded-xl border border-gray-200 shadow-inner">
                         <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-8">
-                            <div class="flex-1"><span class="font-bold text-gray-700">Nombre:</span> ${patient.name}</div>
-                            <div class="flex-1"><span class="font-bold text-gray-700">C.I.:</span> ${patient.ci}</div>
-                            <div class="flex-1"><span class="font-bold text-gray-700">Tipo de Sangre:</span> ${patient.bloodType}</div>
+                            <div class="flex-1"><span class="font-bold text-gray-700">Nombre:</span> ${nombre}</div>
+                            <div class="flex-1"><span class="font-bold text-gray-700">C.I.:</span> ${ci}</div>
+                            <div class="flex-1"><span class="font-bold text-gray-700">Tipo de Sangre:</span> ${tipoSangre}</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Tarjeta de Síntomas -->
                     <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
                         <h2 class="text-xl font-semibold text-gray-800 mb-2">Síntomas</h2>
-                        <ul class="list-disc list-inside space-y-2 text-gray-700">
-                            ${patient.history.symptoms.map(symptom => `<li><strong>${symptom.date}:</strong> ${symptom.symptom}</li>`).join('')}
-                        </ul>
+                        ${ulFromArray(sintomas)}
                     </div>
-                    
-                    <!-- Tarjeta de Diagnósticos -->
+
                     <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
                         <h2 class="text-xl font-semibold text-gray-800 mb-2">Diagnóstico</h2>
-                        <ul class="list-disc list-inside space-y-2 text-gray-700">
-                            ${patient.history.diagnosis.map(d => `<li><strong>${d.date}:</strong> ${d.diagnosis}</li>`).join('')}
-                        </ul>
+                        ${ulFromArray(diagnosticos)}
                     </div>
 
-                    <!-- Tarjeta de Exámenes Físicos -->
                     <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
                         <h2 class="text-xl font-semibold text-gray-800 mb-2">Exámenes Físicos</h2>
-                        <ul class="list-disc list-inside space-y-2 text-gray-700">
-                            ${patient.history.physicalExams.map(exam => `<li><strong>${exam.date}:</strong> ${exam.observations}</li>`).join('')}
-                        </ul>
+                        ${ulFromArray(examenes_fisicos)}
                     </div>
 
-                    <!-- Tarjeta de Análisis de Laboratorio -->
                     <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
                         <h2 class="text-xl font-semibold text-gray-800 mb-2">Análisis de Laboratorio</h2>
-                        <ul class="list-disc list-inside space-y-2 text-gray-700">
-                            ${patient.history.labTests.map(test => `<li><strong>${test.date}:</strong> ${test.test} - ${test.results}</li>`).join('')}
-                        </ul>
+                        ${ulFromArray(analisis_laboratorio)}
                     </div>
 
-                    <!-- Tarjeta de Seguimiento de Tratamientos -->
                     <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
                         <h2 class="text-xl font-semibold text-gray-800 mb-2">Seguimiento de Tratamientos</h2>
-                        <ul class="list-disc list-inside space-y-2 text-gray-700">
-                            ${patient.history.treatments.map(treatment => `<li><strong>${treatment.date}:</strong> ${treatment.treatment}</li>`).join('')}
-                        </ul>
-                    </div>
-                    
-                    <!-- Tarjeta de Notas Adicionales -->
-                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Notas Adicionales</h2>
-                        <ul class="list-disc list-inside space-y-2 text-gray-700">
-                            ${patient.history.additionalNotes.map(note => `<li><strong>${note.date}:</strong> ${note.note}</li>`).join('')}
-                        </ul>
+                        ${ulFromArray(tratamientos)}
                     </div>
 
-                    <!-- Tarjeta para Añadir Nueva Observación -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Notas Adicionales</h2>
+                        ${ulFromArray(notas_adicionales)}
+                    </div>
+
+                    <!-- Form para añadir nueva entrada (actualiza cache local) -->
                     <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 shadow-md flex flex-col justify-between col-span-1 lg:col-span-2">
                         <h2 class="text-xl font-semibold text-blue-800 mb-4">Añadir Nueva Entrada al Historial</h2>
-                        <form onsubmit="event.preventDefault(); addNewEntry(${patient.id});">
+                        <form onsubmit="event.preventDefault(); addNewEntry(${patient.id || patient.ID});">
                             <div class="mb-4">
                                 <label for="entry-type" class="block text-gray-700 font-bold mb-2">Tipo de Entrada</label>
                                 <select id="entry-type" class="w-full p-3 text-gray-700 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="symptom">Síntoma</option>
-                                    <option value="diagnosis">Diagnóstico</option>
-                                    <option value="physicalExams">Examen Físico</option>
-                                    <option value="labTests">Análisis de Laboratorio</option>
-                                    <option value="treatments">Tratamiento</option>
-                                    <option value="additionalNotes">Nota Adicional</option>
+                                    <option value="sintomas">Síntoma</option>
+                                    <option value="diagnosticos">Diagnóstico</option>
+                                    <option value="examenes_fisicos">Examen Físico</option>
+                                    <option value="analisis_laboratorio">Análisis de Laboratorio</option>
+                                    <option value="tratamientos">Tratamiento</option>
+                                    <option value="notas_adicionales">Nota Adicional</option>
                                 </select>
                             </div>
                             <textarea id="new-entry-textarea" class="w-full p-2 text-gray-700 border border-blue-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4" placeholder="Escribe aquí la nueva entrada..."></textarea>
@@ -426,79 +366,69 @@
             showView('detalle-paciente-view');
         }
 
-        // Función para añadir una nueva entrada
+        /* =========================
+        Añadir nueva entrada (cache local)
+        (Si querés persistir, acá puedes hacer un fetch POST al backend)
+        ========================= */
         function addNewEntry(patientId) {
             const textarea = document.getElementById('new-entry-textarea');
-            const newEntryText = textarea.value.trim();
-            const entryType = document.getElementById('entry-type').value;
+            const tipo = document.getElementById('entry-type').value;
+            const texto = (textarea.value || "").trim();
+            if (!texto) return;
 
-            if (newEntryText) {
-                const patient = patientsData.find(p => p.id === patientId);
-                const today = new Date().toLocaleDateString('es-ES');
-                
-                // Agrega la nueva entrada al array correcto según el tipo seleccionado
-                switch (entryType) {
-                    case 'symptom':
-                        patient.history.symptoms.push({ date: today, symptom: newEntryText });
-                        break;
-                    case 'diagnosis':
-                        patient.history.diagnosis.push({ date: today, diagnosis: newEntryText });
-                        break;
-                    case 'physicalExams':
-                        patient.history.physicalExams.push({ date: today, observations: newEntryText });
-                        break;
-                    case 'labTests':
-                        // Para simplificar, asumimos que solo se agrega el resultado.
-                        // En un sistema real se pedirían más datos.
-                        patient.history.labTests.push({ date: today, test: 'N/A', results: newEntryText });
-                        break;
-                    case 'treatments':
-                        patient.history.treatments.push({ date: today, treatment: newEntryText });
-                        break;
-                    case 'additionalNotes':
-                        patient.history.additionalNotes.push({ date: today, note: newEntryText });
-                        break;
-                }
-                
-                // Limpia el formulario y recarga la vista
-                textarea.value = '';
-                showPatientDetails(patientId);
+            const hoy = new Date().toLocaleDateString('es-ES');
+            const p = detalleCache[patientId];
+            if (!p) return;
+
+            // Asegurar array destino
+            p[tipo] = Array.isArray(p[tipo]) ? p[tipo] : [];
+
+            // Estructura genérica { fecha, texto }
+            const entrada = { fecha: hoy, texto };
+
+            // Para lab, ejemplo de campos extra
+            if (tipo === 'analisis_laboratorio' && p[tipo].length === 0) {
+                // si tuvieras estructura {fecha, estudio, resultados}
+                // entrada.estudio = 'N/A';
+                // entrada.resultados = texto;
             }
+
+            p[tipo].push(entrada);
+            textarea.value = '';
+            renderDetalle(p); // re-render
         }
-        
-        // Funciones para el calendario interactivo
+
+        /* =========================
+        Calendario (sin cambios)
+        ========================= */
         function renderCalendar() {
             const monthYear = document.getElementById('month-year');
             const calendarBody = document.getElementById('calendar-body');
             const today = new Date();
             const firstDay = new Date(currentYear, currentMonth, 1);
-            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const lastDay  = new Date(currentYear, currentMonth + 1, 0);
 
             monthYear.textContent = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(firstDay);
             calendarBody.innerHTML = '';
 
-            // Rellenar días vacíos al principio
             for (let i = 0; i < firstDay.getDay(); i++) {
                 calendarBody.innerHTML += `<div class="p-2 rounded-lg text-gray-400"></div>`;
             }
-
-            // Rellenar días del mes
             for (let i = 1; i <= lastDay.getDate(); i++) {
                 const dayDiv = document.createElement('div');
                 dayDiv.className = `p-2 rounded-lg cursor-pointer hover:bg-blue-200 transition-colors duration-200 relative`;
                 dayDiv.textContent = i;
-                
+
                 const dayStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                
+
                 if (today.getDate() === i && today.getMonth() === currentMonth && today.getFullYear() === currentYear) {
                     dayDiv.classList.add('today');
                 }
 
-                // Resaltar días con turnos
                 const hasAppointments = scheduledAppointments.some(appt => appt.date === dayStr);
                 if (hasAppointments) {
                     const dot = document.createElement('div');
-                    dot.className = 'absolute bottom-1 right-1 h-2 w-2 bg-blue-500 rounded-full';
+                    dot.className = 'absolute bottom-1 right-1 h-2 w-2 rounded-full bg-blue-500';
                     dayDiv.appendChild(dot);
                 }
 
@@ -509,97 +439,70 @@
 
         function prevMonth() {
             currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
             renderCalendar();
             document.getElementById('selected-day-appointments-list').innerHTML = `<p class="text-gray-500">Selecciona un día para ver los turnos.</p>`;
         }
-
         function nextMonth() {
             currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
             renderCalendar();
             document.getElementById('selected-day-appointments-list').innerHTML = `<p class="text-gray-500">Selecciona un día para ver los turnos.</p>`;
         }
-
         function selectDay(date) {
             selectedDay = date;
             const appointmentsForDay = scheduledAppointments.filter(appt => appt.date === date);
             const listContainer = document.getElementById('selected-day-appointments-list');
             listContainer.innerHTML = '';
-            
-            if (appointmentsForDay.length > 0) {
-                appointmentsForDay.forEach(appt => {
-                    const appointmentDiv = document.createElement('div');
-                    appointmentDiv.className = 'bg-white p-4 rounded-xl border border-gray-200 shadow-sm';
-                    appointmentDiv.innerHTML = `
-                        <p class="font-bold text-gray-800">${appt.time} - ${appt.patientName}</p>
-                        <p class="text-sm text-gray-600">${appt.specialty}</p>
-                    `;
-                    listContainer.appendChild(appointmentDiv);
-                });
-            } else {
+
+            if (appointmentsForDay.length === 0) {
                 listContainer.innerHTML = `<p class="text-gray-500">No hay turnos para este día.</p>`;
+                return;
             }
+            appointmentsForDay.forEach(appt => {
+                const item = document.createElement('div');
+                item.className = 'bg-white border border-gray-200 rounded-lg p-3 shadow hover:shadow-md transition-shadow';
+                item.innerHTML = `
+                    <p class="font-bold text-blue-800">${appt.time} - ${appt.patientName}</p>
+                    <p class="text-gray-600 text-sm">${appt.specialty}</p>
+                `;
+                listContainer.appendChild(item);
+            });
         }
 
-        // Formulario para agendar un nuevo turno
-        document.getElementById('schedule-appointment-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const patientName = document.getElementById('appointment-patient-name').value;
-            const appointmentTime = document.getElementById('appointment-time').value;
+        /* =========================
+        Búsqueda en lista principal
+        ========================= */
+        function attachSearch() {
+            const input = document.getElementById('patient-search-input');
+            if (!input) return;
+            input.addEventListener('input', function() {
+                const q = this.value.toLowerCase();
+                const filtered = pacientesResumen.filter(p =>
+                    (p.nombre || "").toLowerCase().includes(q) ||
+                    (p.ci || "").toLowerCase().includes(q)
+                );
+                renderPacientes(filtered);
+            });
+        }
 
-            if (selectedDay) {
-                const newAppointment = {
-                    date: selectedDay,
-                    time: appointmentTime,
-                    patientName: patientName,
-                    specialty: 'Medicina General' // Valor por defecto para el ejemplo
-                };
-                scheduledAppointments.push(newAppointment);
-                
-                // Limpiar el formulario
-                this.reset();
-                
-                // Recargar el calendario y la lista de turnos para el día seleccionado
-                renderCalendar();
-                selectDay(selectedDay);
-            } else {
-                alert('Por favor, selecciona un día en el calendario.');
-            }
-        });
-        
-        // Formulario para registrar un paciente de imprevisto
-        document.getElementById('unscheduled-patient-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const patientName = document.getElementById('unscheduled-patient-name').value.trim();
-            if (patientName) {
-                // Lógica para manejar el registro de un paciente de imprevisto.
-                // En este ejemplo, simplemente se muestra una alerta.
-                alert(`Paciente de imprevisto registrado: ${patientName}.`);
-                this.reset();
-            }
-        });
+        /* =========================
+        Inicio
+        ========================= */
+        document.addEventListener("DOMContentLoaded", () => {
+            // Carga resumen (se recomienda que el backend incluya también "nombre" en cada item)
+            fetch("/api/pacientes")
+                .then(r => r.json())
+                .then(data => {
+                    pacientesResumen = Array.isArray(data) ? data : [];
+                    renderPacientes(pacientesResumen);
+                    attachSearch();
+                })
+                .catch(err => console.error("Error cargando pacientes:", err));
 
-        // Filtrado de pacientes
-        document.getElementById('patient-search-input').addEventListener('input', function(event) {
-            const searchTerm = event.target.value.toLowerCase();
-            const filtered = patientsData.filter(patient =>
-                patient.name.toLowerCase().includes(searchTerm) ||
-                patient.ci.toLowerCase().includes(searchTerm)
-            );
-            renderPatientsList(filtered);
-        });
-
-        // Al cargar la página, se muestra la vista de "Inicio" por defecto
-        document.addEventListener('DOMContentLoaded', () => {
             showView('inicio-view');
         });
+
     </script>
 </body>
 </html>

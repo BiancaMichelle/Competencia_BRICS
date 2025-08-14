@@ -11,14 +11,22 @@
     "nombre": "María López",
     "dni": "87654321",
     "clave": "abcd",
-    "roles": ["paciente"]
+    "roles": ["paciente"],
+    "tipo_sangre": "O+",
+    "historial": ["Consulta general - 2025-03-15", "Vacunación - 2025-05-01"],
+    "diagnosticos": ["Hipertensión", "Colesterol alto"],
+    "alergias": ["Penicilina"]
   },
   {
     "usuario": "carlos.mendez",
     "nombre": "Carlos Méndez",
     "dni": "45678912",
     "clave": "pass1",
-    "roles": ["paciente"]
+    "roles": ["paciente"],
+    "tipo_sangre": "A-",
+    "historial": ["Chequeo anual - 2025-02-10"],
+    "diagnosticos": [],
+    "alergias": ["Ninguna"]
   },
   {
     "usuario": "medico.gomez",
