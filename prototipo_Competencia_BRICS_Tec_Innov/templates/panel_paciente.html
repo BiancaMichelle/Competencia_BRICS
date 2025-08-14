@@ -1,4 +1,282 @@
-<h2>Bienvenido, {{ usuario.nombre }}</h2>
-<p>Edad: {{ usuario.edad }}</p>
-<p>Tipo de sangre: {{ usuario.tipo_sangre }}</p>
-<p>Enfermedades: {{ usuario.enfermedades }}</p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Paciente - Sistema Médico</title>
+    <!-- CDN de Tailwind CSS para estilos modernos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilo personalizado para usar la fuente Inter de Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- Barra de Navegación Formal -->
+    <header class="bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <!-- Título o Logo del Sistema -->
+            <div class="text-2xl font-bold text-blue-900">
+                <a href="#" class="flex items-center space-x-2">
+                    <!-- Icono de un estetoscopio -->
+                                <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="ARQA Logo" class="h-12 w-auto mb-4">
+                    <span>Sistema Médico</span>
+                </a>
+            </div>
+            
+            <!-- Enlaces de Navegación del Paciente -->
+            <div class="flex items-center space-x-4">
+                <a href="#" onclick="showView('inicio-view')" id="nav-inicio" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Inicio</a>
+                <a href="#" onclick="showView('turnos-view')" id="nav-turnos" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Mis Turnos</a>
+                <a href="#" onclick="showView('historial-view')" id="nav-historial" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Mi Historial Médico</a>
+                
+                <!-- Botón de Cerrar Sesión -->
+                <button onclick="logout()" class="text-red-600 hover:text-red-800 font-semibold transition-colors duration-300">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow container mx-auto px-6 py-8">
+        
+        <!-- Vista de Inicio del Paciente (visible por defecto) -->
+        <div id="inicio-view" class="bg-white p-8 rounded-2xl shadow-lg">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Bienvenido, Juan Pérez</h1>
+            <p class="text-gray-600 mb-8">
+                Aquí puedes ver un resumen de tus datos personales y médicos.
+            </p>
+
+            <!-- Sección de Datos Principales -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Datos Principales</h2>
+                <div class="p-6 bg-gray-50 rounded-xl border border-gray-200 shadow-inner">
+                    <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-8">
+                        <div class="flex-1">
+                            <span class="font-bold text-gray-700">Nombre:</span>
+                            <span class="text-gray-900 ml-2">Juan Pérez</span>
+                        </div>
+                        <div class="flex-1">
+                            <span class="font-bold text-gray-700">Edad:</span>
+                            <span class="text-gray-900 ml-2">35 años</span>
+                        </div>
+                        <div class="flex-1">
+                            <span class="font-bold text-gray-700">C.I.:</span>
+                            <span class="text-gray-900 ml-2">1122334-5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sección de Información Médica -->
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Información Médica</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Tarjeta: Tipo de Sangre -->
+                    <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 shadow-md">
+                        <h3 class="text-xl font-bold text-blue-800 mb-2">Tipo de Sangre</h3>
+                        <p class="text-gray-700 text-lg">O+</p>
+                    </div>
+
+                    <!-- Tarjeta: Enfermedad Actual -->
+                    <div class="bg-red-50 p-6 rounded-xl border border-red-200 shadow-md">
+                        <h3 class="text-xl font-bold text-red-800 mb-2">Enfermedad Actual</h3>
+                        <p class="text-gray-700">Diabetes tipo 2</p>
+                    </div>
+
+                    <!-- Tarjeta: Condición -->
+                    <div class="bg-yellow-50 p-6 rounded-xl border border-yellow-200 shadow-md">
+                        <h3 class="text-xl font-bold text-yellow-800 mb-2">Condiciones Médicas</h3>
+                        <p class="text-gray-700">Hipertensión</p>
+                    </div>
+
+                    <!-- Tarjeta: Alergias -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Alergias</h3>
+                        <p class="text-gray-700">Penicilina</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Mis Turnos (oculta por defecto) -->
+        <div id="turnos-view" class="bg-white p-8 rounded-2xl shadow-lg hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Mis Próximos Turnos</h1>
+            <div id="turnos-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Las tarjetas de turnos se generarán aquí con JavaScript -->
+            </div>
+        </div>
+
+        <!-- Nueva Vista de Mi Historial Médico (oculta por defecto) -->
+        <div id="historial-view" class="bg-white p-8 rounded-2xl shadow-lg hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Mi Historial Médico</h1>
+
+            <!-- Secciones del historial médico -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Tarjeta de Antecedentes -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Antecedentes Médicos</h2>
+                    <ul id="antecedentes-list" class="list-disc list-inside space-y-1 text-gray-700">
+                        <!-- Lista de antecedentes se generará con JS -->
+                    </ul>
+                </div>
+
+                <!-- Tarjeta de Resultados de Pruebas -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Resultados de Pruebas</h2>
+                    <ul id="pruebas-list" class="list-disc list-inside space-y-1 text-gray-700">
+                        <!-- Lista de pruebas se generará con JS -->
+                    </ul>
+                </div>
+
+                <!-- Tarjeta de Tratamientos y Medicación -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Tratamientos y Medicación</h2>
+                    <ul id="tratamientos-list" class="list-disc list-inside space-y-1 text-gray-700">
+                        <!-- Lista de tratamientos se generará con JS -->
+                    </ul>
+                </div>
+
+                <!-- Tarjeta de Cirugías -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Cirugías</h2>
+                    <ul id="cirugias-list" class="list-disc list-inside space-y-1 text-gray-700">
+                        <!-- Lista de cirugías se generará con JS -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pie de Página -->
+    <footer class="bg-gray-800 text-white text-center p-4 mt-8">
+        <p class="text-sm">&copy; 2025 ARQA. Todos los derechos reservados.</p>
+    </footer>
+    
+    <!-- Script para funcionalidad interactiva de navegación y datos -->
+    <script>
+        // Datos de ejemplo para los turnos del paciente
+        const myAppointments = [
+            {
+                professionalName: 'Dra. Ana Gómez',
+                specialty: 'Dermatóloga',
+                date: '15 de octubre de 2024',
+                time: '10:30 AM',
+                status: 'Confirmado'
+            },
+            {
+                professionalName: 'Dr. Javier Pérez',
+                specialty: 'Cardiólogo',
+                date: '20 de octubre de 2024',
+                time: '04:00 PM',
+                status: 'Confirmado'
+            },
+            {
+                professionalName: 'Lic. María Solís',
+                specialty: 'Nutricionista',
+                date: '25 de octubre de 2024',
+                time: '09:00 AM',
+                status: 'Pendiente'
+            }
+        ];
+
+        // Datos de ejemplo para el historial médico del paciente
+        const patientHistory = {
+            antecedentes: [
+                'Hipertensión arterial (diagnosticada en 2018)',
+                'Diabetes tipo 2 (diagnosticada en 2020)',
+                'Alergia a la penicilina'
+            ],
+            pruebas: [
+                'Análisis de sangre (2024-09-10): Glucosa 130 mg/dL, Colesterol 210 mg/dL',
+                'Electrocardiograma (2024-08-15): Resultados normales'
+            ],
+            tratamientos: [
+                'Metformina 500 mg (1 pastilla al día)',
+                'Amlodipina 5 mg (1 pastilla al día)',
+                'Plan de alimentación para control de glucosa'
+            ],
+            cirugias: [
+                'Apendicectomía (2005)',
+                'Cirugía de cataratas (2022)'
+            ]
+        };
+
+        // Función para mostrar la vista correcta y ocultar las demás
+        function showView(viewId) {
+            const views = ['inicio-view', 'turnos-view', 'historial-view'];
+            views.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+
+            // Opcional: Renderizar datos específicos de la vista si es necesario
+            if (viewId === 'turnos-view') {
+                renderAppointments();
+            } else if (viewId === 'historial-view') {
+                renderMedicalHistory();
+            }
+        }
+
+        // Función para renderizar las tarjetas de turnos
+        function renderAppointments() {
+            const container = document.getElementById('turnos-container');
+            container.innerHTML = ''; // Limpiar el contenedor antes de renderizar
+
+            myAppointments.forEach(appointment => {
+                const card = document.createElement('div');
+                card.className = 'bg-blue-50 p-6 rounded-xl border border-blue-200 shadow-md';
+                
+                // Mapeo de especialidades a colores (ejemplo)
+                let specialtyColorClass = 'text-gray-600';
+                if (appointment.specialty === 'Dermatóloga') {
+                    specialtyColorClass = 'text-green-600';
+                } else if (appointment.specialty === 'Cardiólogo') {
+                    specialtyColorClass = 'text-red-600';
+                } else if (appointment.specialty === 'Nutricionista') {
+                    specialtyColorClass = 'text-yellow-600';
+                }
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="text-xl font-bold text-blue-800">${appointment.professionalName}</h3>
+                            <p class="font-semibold text-sm ${specialtyColorClass}">${appointment.specialty}</p>
+                        </div>
+                        <span class="bg-blue-200 text-blue-800 text-sm font-semibold px-2 py-1 rounded-full">${appointment.status}</span>
+                    </div>
+                    <p class="text-gray-700 mb-1"><span class="font-bold">Fecha:</span> ${appointment.date}</p>
+                    <p class="text-gray-700"><span class="font-bold">Hora:</span> ${appointment.time}</p>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // Nueva función para renderizar el historial médico
+        function renderMedicalHistory() {
+            const antecedentesList = document.getElementById('antecedentes-list');
+            antecedentesList.innerHTML = patientHistory.antecedentes.map(item => `<li>${item}</li>`).join('');
+
+            const pruebasList = document.getElementById('pruebas-list');
+            pruebasList.innerHTML = patientHistory.pruebas.map(item => `<li>${item}</li>`).join('');
+
+            const tratamientosList = document.getElementById('tratamientos-list');
+            tratamientosList.innerHTML = patientHistory.tratamientos.map(item => `<li>${item}</li>`).join('');
+            
+            const cirugiasList = document.getElementById('cirugias-list');
+            cirugiasList.innerHTML = patientHistory.cirugias.map(item => `<li>${item}</li>`).join('');
+        }
+
+        // Al cargar la página, se muestra la vista de "Inicio" por defecto
+        document.addEventListener('DOMContentLoaded', () => {
+            showView('inicio-view');
+        });
+    </script>
+</body>
+</html>

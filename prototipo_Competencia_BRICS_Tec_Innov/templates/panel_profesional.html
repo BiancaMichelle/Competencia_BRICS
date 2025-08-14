@@ -1,4 +1,603 @@
-<h2>Panel del Profesional</h2>
-<p>Acceso a registros médicos y autorizaciones.</p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Médico - Sistema de Gestión Médica</title>
+    <!-- CDN de Tailwind CSS para estilos modernos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilo personalizado para usar la fuente Inter de Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Clase para destacar el día actual en el calendario */
+        .today {
+            @apply ring-2 ring-blue-500 bg-blue-100 font-bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-<a href="/registrar_observacion">Registrar nueva observación médica</a>
+    <!-- Barra de Navegación Formal -->
+    <header class="bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <!-- Título o Logo del Sistema -->
+            <div class="text-2xl font-bold text-blue-900">
+                <a href="#" class="flex items-center space-x-2">
+                    <!-- Icono de un estetoscopio -->
+                    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="ARQA Logo" class="h-12 w-auto mb-4">
+
+                    <span>Sistema Médico</span>
+                </a>
+            </div>
+            
+            <!-- Enlaces de Navegación del Médico -->
+            <div class="flex items-center space-x-4">
+                <a href="#" onclick="showView('inicio-view')" id="nav-inicio" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Inicio</a>
+                <a href="#" onclick="showView('turnos-view')" id="nav-turnos" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Turnos</a>
+                <a href="#" onclick="showView('pacientes-view')" id="nav-pacientes" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Pacientes</a>
+                <button onclick="logout()" class="text-red-600 hover:text-red-800 font-semibold transition-colors duration-300">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow container mx-auto px-6 py-8">
+        
+        <!-- Vista de Inicio (visible por defecto) -->
+        <div id="inicio-view" class="bg-white p-8 rounded-2xl shadow-lg">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Bienvenido, Dr. [Nombre del Médico]</h1>
+            <p class="text-gray-600 mb-8">
+                Aquí tienes un resumen rápido de tu agenda y pacientes.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Tarjeta de Turnos de Hoy -->
+                <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 shadow-md">
+                    <h2 class="text-xl font-bold text-blue-800 mb-2">Turnos de Hoy</h2>
+                    <p class="text-gray-700 text-lg"><span class="font-bold">5</span> pacientes</p>
+                </div>
+                <!-- Tarjeta de Próximos Turnos -->
+                <div class="bg-green-50 p-6 rounded-xl border border-green-200 shadow-md">
+                    <h2 class="text-xl font-bold text-green-800 mb-2">Próximos 7 días</h2>
+                    <p class="text-gray-700 text-lg"><span class="font-bold">12</span> turnos agendados</p>
+                </div>
+                <!-- Tarjeta de Total de Pacientes -->
+                <div class="bg-purple-50 p-6 rounded-xl border border-purple-200 shadow-md">
+                    <h2 class="text-xl font-bold text-purple-800 mb-2">Total de Pacientes</h2>
+                    <p class="text-gray-700 text-lg"><span class="font-bold">50+</span> en tu lista</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Turnos -->
+        <div id="turnos-view" class="bg-white p-8 rounded-2xl shadow-lg hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Calendario y Turnos</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Columna Izquierda: Calendario y lista de turnos -->
+                <div class="md:col-span-1 bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-inner">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Calendario de Turnos</h2>
+                        <!-- Encabezado del calendario -->
+                        <div class="flex justify-between items-center mb-4">
+                            <button onclick="prevMonth()" class="text-blue-600 hover:text-blue-800 transition-colors">&lt; Anterior</button>
+                            <h3 id="month-year" class="text-lg font-bold text-gray-800"></h3>
+                            <button onclick="nextMonth()" class="text-blue-600 hover:text-blue-800 transition-colors">Siguiente &gt;</button>
+                        </div>
+                        <!-- Días de la semana -->
+                        <div class="grid grid-cols-7 gap-1 text-center font-semibold text-gray-600 mb-2">
+                            <span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span>
+                        </div>
+                        <!-- Contenedor del calendario (días) -->
+                        <div id="calendar-body" class="grid grid-cols-7 gap-1 text-center text-gray-800">
+                            <!-- Los días se renderizarán aquí con JS -->
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Turnos del Día Seleccionado</h2>
+                        <div id="selected-day-appointments-list" class="space-y-3">
+                            <p class="text-gray-500">Haz clic en un día del calendario para ver los turnos.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Formulario para agendar turnos y registrar imprevistos -->
+                <div class="md:col-span-1 bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-inner">
+                    <!-- Formulario para agendar un nuevo turno -->
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Agendar un Turno</h2>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Selecciona un día en el calendario y usa este formulario para agendar un turno.
+                    </p>
+                    <form id="schedule-appointment-form" class="mb-8">
+                        <div class="mb-4">
+                            <label for="appointment-patient-name" class="block text-gray-700 font-bold mb-2">Nombre del Paciente</label>
+                            <input type="text" id="appointment-patient-name" required placeholder="Ej: Juan Pérez"
+                                class="w-full p-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-4">
+                            <label for="appointment-time" class="block text-gray-700 font-bold mb-2">Hora</label>
+                            <input type="time" id="appointment-time" required
+                                class="w-full p-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md">
+                            Agendar Turno
+                        </button>
+                    </form>
+
+                    <!-- Formulario para registrar pacientes de imprevisto -->
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Registrar Paciente de Imprevisto</h2>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Usa este formulario para agregar a un paciente que no tenía un turno agendado.
+                    </p>
+                    <form id="unscheduled-patient-form">
+                        <div class="mb-4">
+                            <label for="unscheduled-patient-name" class="block text-gray-700 font-bold mb-2">Nombre del Paciente</label>
+                            <input type="text" id="unscheduled-patient-name" required placeholder="Ej: Dra. Ana Gómez"
+                                class="w-full p-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <button type="submit" class="mt-4 w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md">
+                            Registrar Imprevisto
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vista de Pacientes -->
+        <div id="pacientes-view" class="bg-white p-8 rounded-2xl shadow-lg hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Lista de Pacientes</h1>
+            <div class="mb-6">
+                <input type="text" id="patient-search-input" placeholder="Filtrar por nombre o CI..."
+                    class="w-full p-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="patients-list-container">
+                <!-- La lista de pacientes se generará con JavaScript -->
+            </div>
+        </div>
+
+        <!-- Vista de Detalle del Paciente -->
+        <div id="detalle-paciente-view" class="bg-white p-8 rounded-2xl shadow-lg hidden">
+            <div class="flex items-center mb-6">
+                <button onclick="showView('pacientes-view')" class="text-blue-600 hover:text-blue-800 transition-colors duration-300 mr-4">
+                    <!-- Icono de flecha izquierda -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Volver a Pacientes
+                </button>
+                <h1 id="patient-details-name" class="text-3xl font-bold text-gray-800"></h1>
+            </div>
+            
+            <div id="patient-info-container">
+                <!-- La información detallada del paciente se generará con JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Pie de Página -->
+    <footer class="bg-gray-800 text-white text-center p-4 mt-8">
+        <p class="text-sm">&copy; 2025 ARQA. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Script para funcionalidad interactiva y datos -->
+    <script>
+        // Datos de ejemplo para los pacientes
+        const patientsData = [
+            {
+                id: 1,
+                name: 'Juan Pérez',
+                ci: '1122334-5',
+                bloodType: 'O+',
+                currentIllness: 'Diabetes tipo 2',
+                condition: 'Hipertensión',
+                allergies: 'Penicilina',
+                history: {
+                    physicalExams: [
+                        { date: '10/05/2024', observations: 'Presión arterial 130/85 mmHg, peso 85 kg, altura 1.75 m. Examen físico general sin hallazgos relevantes.' },
+                        { date: '05/01/2024', observations: 'Presión arterial 135/90 mmHg, peso 86 kg. Se observan ligeros edemas en tobillos.' }
+                    ],
+                    labTests: [
+                        { date: '10/05/2024', test: 'Hemograma completo', results: 'Glucosa 130 mg/dL, Colesterol total 210 mg/dL, Triglicéridos 160 mg/dL.' },
+                        { date: '05/01/2024', test: 'Análisis de orina', results: 'Presencia de proteínas en orina.' }
+                    ],
+                    treatments: [
+                        { date: '10/05/2024', treatment: 'Ajuste de dosis de Metformina. Inicio de dieta baja en sodio.' },
+                        { date: '05/01/2024', treatment: 'Metformina 500mg, Amlodipina 5mg. Dieta balanceada.' }
+                    ],
+                    symptoms: [
+                        { date: '10/05/2024', symptom: 'Fatiga persistente, sed excesiva.' },
+                        { date: '05/01/2024', symptom: 'Micción frecuente.' }
+                    ],
+                    diagnosis: [
+                        { date: '10/05/2024', diagnosis: 'Diabetes tipo 2, descontrolada.' }
+                    ],
+                    additionalNotes: [
+                        { date: '10/05/2024', note: 'Viaje reciente a la costa, posible cambio en la dieta.' }
+                    ]
+                }
+            },
+            {
+                id: 2,
+                name: 'María López',
+                ci: '2233445-6',
+                bloodType: 'A-',
+                currentIllness: 'Asma',
+                condition: 'Ninguna',
+                allergies: 'Polen',
+                history: {
+                    physicalExams: [
+                        { date: '20/06/2024', observations: 'Ausencia de sibilancias, saturación de oxígeno 98%. Auscultación pulmonar sin anormalidades.' }
+                    ],
+                    labTests: [],
+                    treatments: [
+                        { date: '20/06/2024', treatment: 'Inhalador de salbutamol para rescate. Control anual de la función pulmonar.' }
+                    ],
+                    symptoms: [
+                        { date: '20/06/2024', symptom: 'Sibilancias ocasionales, dificultad para respirar al hacer ejercicio.' }
+                    ],
+                    diagnosis: [
+                        { date: '20/06/2024', diagnosis: 'Asma leve persistente.' }
+                    ],
+                    additionalNotes: []
+                }
+            },
+             {
+                id: 3,
+                name: 'Pedro Ramírez',
+                ci: '3344556-7',
+                bloodType: 'B+',
+                currentIllness: 'Gastritis',
+                condition: 'Sin alergias',
+                allergies: 'Ninguna',
+                history: {
+                    physicalExams: [
+                        { date: '12/07/2024', observations: 'Presión arterial 120/80 mmHg, peso 70 kg. Abdomen blando, dolor epigástrico a la palpación.' }
+                    ],
+                    labTests: [
+                        { date: '12/07/2024', test: 'Endoscopia', results: 'Inflamación de la mucosa gástrica.' }
+                    ],
+                    treatments: [
+                        { date: '12/07/2024', treatment: 'Omeprazol 20mg (1 cápsula al día). Dieta blanda.' }
+                    ],
+                    symptoms: [
+                        { date: '12/07/2024', symptom: 'Dolor en el estómago, ardor, náuseas.' }
+                    ],
+                    diagnosis: [
+                        { date: '12/07/2024', diagnosis: 'Gastritis aguda.' }
+                    ],
+                    additionalNotes: [
+                        { date: '12/07/2024', note: 'Ha estado comiendo comida muy picante.' }
+                    ]
+                }
+            }
+        ];
+        
+        // Datos de ejemplo para los turnos agendados
+        let scheduledAppointments = [
+             { date: '2024-10-25', time: '09:00', patientName: 'Lic. María Solís', specialty: 'Nutricionista' },
+             { date: '2024-10-15', time: '10:30', patientName: 'Dra. Ana Gómez', specialty: 'Dermatóloga' },
+             { date: '2024-10-15', time: '16:00', patientName: 'Dr. Javier Pérez', specialty: 'Cardiólogo' }
+        ];
+
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let selectedDay = null;
+
+        // Función para mostrar la vista correcta y ocultar las demás
+        function showView(viewId) {
+            const views = ['inicio-view', 'turnos-view', 'pacientes-view', 'detalle-paciente-view'];
+            views.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+
+            // Renderizar datos específicos de la vista si es necesario
+            if (viewId === 'turnos-view') {
+                renderCalendar();
+            } else if (viewId === 'pacientes-view') {
+                renderPatientsList();
+            }
+        }
+        
+        // Función para renderizar la lista de pacientes
+        function renderPatientsList(filteredPatients = patientsData) {
+            const container = document.getElementById('patients-list-container');
+            container.innerHTML = ''; // Limpiar el contenedor
+
+            if (filteredPatients.length === 0) {
+                 container.innerHTML = `<p class="text-gray-500 text-center col-span-full">No se encontraron pacientes.</p>`;
+                 return;
+            }
+
+            filteredPatients.forEach(patient => {
+                const card = document.createElement('div');
+                card.className = 'bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md cursor-pointer hover:bg-gray-100 transition-colors duration-200';
+                card.onclick = () => showPatientDetails(patient.id);
+                card.innerHTML = `
+                    <h3 class="text-xl font-bold text-blue-800">${patient.name}</h3>
+                    <p class="text-gray-700">C.I.: ${patient.ci}</p>
+                    <p class="text-gray-700">Enfermedad actual: <span class="font-semibold text-red-600">${patient.currentIllness}</span></p>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        // Función para mostrar los detalles de un paciente específico
+        function showPatientDetails(patientId) {
+            const patient = patientsData.find(p => p.id === patientId);
+            if (!patient) {
+                console.error('Paciente no encontrado');
+                return;
+            }
+
+            document.getElementById('patient-details-name').textContent = `Historial de ${patient.name}`;
+            const container = document.getElementById('patient-info-container');
+            container.innerHTML = `
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Datos Principales</h2>
+                    <div class="p-6 bg-gray-50 rounded-xl border border-gray-200 shadow-inner">
+                        <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-8">
+                            <div class="flex-1"><span class="font-bold text-gray-700">Nombre:</span> ${patient.name}</div>
+                            <div class="flex-1"><span class="font-bold text-gray-700">C.I.:</span> ${patient.ci}</div>
+                            <div class="flex-1"><span class="font-bold text-gray-700">Tipo de Sangre:</span> ${patient.bloodType}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Tarjeta de Síntomas -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Síntomas</h2>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                            ${patient.history.symptoms.map(symptom => `<li><strong>${symptom.date}:</strong> ${symptom.symptom}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <!-- Tarjeta de Diagnósticos -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Diagnóstico</h2>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                            ${patient.history.diagnosis.map(d => `<li><strong>${d.date}:</strong> ${d.diagnosis}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <!-- Tarjeta de Exámenes Físicos -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Exámenes Físicos</h2>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                            ${patient.history.physicalExams.map(exam => `<li><strong>${exam.date}:</strong> ${exam.observations}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <!-- Tarjeta de Análisis de Laboratorio -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Análisis de Laboratorio</h2>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                            ${patient.history.labTests.map(test => `<li><strong>${test.date}:</strong> ${test.test} - ${test.results}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <!-- Tarjeta de Seguimiento de Tratamientos -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Seguimiento de Tratamientos</h2>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                            ${patient.history.treatments.map(treatment => `<li><strong>${treatment.date}:</strong> ${treatment.treatment}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <!-- Tarjeta de Notas Adicionales -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Notas Adicionales</h2>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                            ${patient.history.additionalNotes.map(note => `<li><strong>${note.date}:</strong> ${note.note}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <!-- Tarjeta para Añadir Nueva Observación -->
+                    <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 shadow-md flex flex-col justify-between col-span-1 lg:col-span-2">
+                        <h2 class="text-xl font-semibold text-blue-800 mb-4">Añadir Nueva Entrada al Historial</h2>
+                        <form onsubmit="event.preventDefault(); addNewEntry(${patient.id});">
+                            <div class="mb-4">
+                                <label for="entry-type" class="block text-gray-700 font-bold mb-2">Tipo de Entrada</label>
+                                <select id="entry-type" class="w-full p-3 text-gray-700 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="symptom">Síntoma</option>
+                                    <option value="diagnosis">Diagnóstico</option>
+                                    <option value="physicalExams">Examen Físico</option>
+                                    <option value="labTests">Análisis de Laboratorio</option>
+                                    <option value="treatments">Tratamiento</option>
+                                    <option value="additionalNotes">Nota Adicional</option>
+                                </select>
+                            </div>
+                            <textarea id="new-entry-textarea" class="w-full p-2 text-gray-700 border border-blue-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4" placeholder="Escribe aquí la nueva entrada..."></textarea>
+                            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300">
+                                Guardar Entrada
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            showView('detalle-paciente-view');
+        }
+
+        // Función para añadir una nueva entrada
+        function addNewEntry(patientId) {
+            const textarea = document.getElementById('new-entry-textarea');
+            const newEntryText = textarea.value.trim();
+            const entryType = document.getElementById('entry-type').value;
+
+            if (newEntryText) {
+                const patient = patientsData.find(p => p.id === patientId);
+                const today = new Date().toLocaleDateString('es-ES');
+                
+                // Agrega la nueva entrada al array correcto según el tipo seleccionado
+                switch (entryType) {
+                    case 'symptom':
+                        patient.history.symptoms.push({ date: today, symptom: newEntryText });
+                        break;
+                    case 'diagnosis':
+                        patient.history.diagnosis.push({ date: today, diagnosis: newEntryText });
+                        break;
+                    case 'physicalExams':
+                        patient.history.physicalExams.push({ date: today, observations: newEntryText });
+                        break;
+                    case 'labTests':
+                        // Para simplificar, asumimos que solo se agrega el resultado.
+                        // En un sistema real se pedirían más datos.
+                        patient.history.labTests.push({ date: today, test: 'N/A', results: newEntryText });
+                        break;
+                    case 'treatments':
+                        patient.history.treatments.push({ date: today, treatment: newEntryText });
+                        break;
+                    case 'additionalNotes':
+                        patient.history.additionalNotes.push({ date: today, note: newEntryText });
+                        break;
+                }
+                
+                // Limpia el formulario y recarga la vista
+                textarea.value = '';
+                showPatientDetails(patientId);
+            }
+        }
+        
+        // Funciones para el calendario interactivo
+        function renderCalendar() {
+            const monthYear = document.getElementById('month-year');
+            const calendarBody = document.getElementById('calendar-body');
+            const today = new Date();
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+
+            monthYear.textContent = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(firstDay);
+            calendarBody.innerHTML = '';
+
+            // Rellenar días vacíos al principio
+            for (let i = 0; i < firstDay.getDay(); i++) {
+                calendarBody.innerHTML += `<div class="p-2 rounded-lg text-gray-400"></div>`;
+            }
+
+            // Rellenar días del mes
+            for (let i = 1; i <= lastDay.getDate(); i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = `p-2 rounded-lg cursor-pointer hover:bg-blue-200 transition-colors duration-200 relative`;
+                dayDiv.textContent = i;
+                
+                const dayStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                
+                if (today.getDate() === i && today.getMonth() === currentMonth && today.getFullYear() === currentYear) {
+                    dayDiv.classList.add('today');
+                }
+
+                // Resaltar días con turnos
+                const hasAppointments = scheduledAppointments.some(appt => appt.date === dayStr);
+                if (hasAppointments) {
+                    const dot = document.createElement('div');
+                    dot.className = 'absolute bottom-1 right-1 h-2 w-2 bg-blue-500 rounded-full';
+                    dayDiv.appendChild(dot);
+                }
+
+                dayDiv.onclick = () => selectDay(dayStr);
+                calendarBody.appendChild(dayDiv);
+            }
+        }
+
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+            document.getElementById('selected-day-appointments-list').innerHTML = `<p class="text-gray-500">Selecciona un día para ver los turnos.</p>`;
+        }
+
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+            document.getElementById('selected-day-appointments-list').innerHTML = `<p class="text-gray-500">Selecciona un día para ver los turnos.</p>`;
+        }
+
+        function selectDay(date) {
+            selectedDay = date;
+            const appointmentsForDay = scheduledAppointments.filter(appt => appt.date === date);
+            const listContainer = document.getElementById('selected-day-appointments-list');
+            listContainer.innerHTML = '';
+            
+            if (appointmentsForDay.length > 0) {
+                appointmentsForDay.forEach(appt => {
+                    const appointmentDiv = document.createElement('div');
+                    appointmentDiv.className = 'bg-white p-4 rounded-xl border border-gray-200 shadow-sm';
+                    appointmentDiv.innerHTML = `
+                        <p class="font-bold text-gray-800">${appt.time} - ${appt.patientName}</p>
+                        <p class="text-sm text-gray-600">${appt.specialty}</p>
+                    `;
+                    listContainer.appendChild(appointmentDiv);
+                });
+            } else {
+                listContainer.innerHTML = `<p class="text-gray-500">No hay turnos para este día.</p>`;
+            }
+        }
+
+        // Formulario para agendar un nuevo turno
+        document.getElementById('schedule-appointment-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const patientName = document.getElementById('appointment-patient-name').value;
+            const appointmentTime = document.getElementById('appointment-time').value;
+
+            if (selectedDay) {
+                const newAppointment = {
+                    date: selectedDay,
+                    time: appointmentTime,
+                    patientName: patientName,
+                    specialty: 'Medicina General' // Valor por defecto para el ejemplo
+                };
+                scheduledAppointments.push(newAppointment);
+                
+                // Limpiar el formulario
+                this.reset();
+                
+                // Recargar el calendario y la lista de turnos para el día seleccionado
+                renderCalendar();
+                selectDay(selectedDay);
+            } else {
+                alert('Por favor, selecciona un día en el calendario.');
+            }
+        });
+        
+        // Formulario para registrar un paciente de imprevisto
+        document.getElementById('unscheduled-patient-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const patientName = document.getElementById('unscheduled-patient-name').value.trim();
+            if (patientName) {
+                // Lógica para manejar el registro de un paciente de imprevisto.
+                // En este ejemplo, simplemente se muestra una alerta.
+                alert(`Paciente de imprevisto registrado: ${patientName}.`);
+                this.reset();
+            }
+        });
+
+        // Filtrado de pacientes
+        document.getElementById('patient-search-input').addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase();
+            const filtered = patientsData.filter(patient =>
+                patient.name.toLowerCase().includes(searchTerm) ||
+                patient.ci.toLowerCase().includes(searchTerm)
+            );
+            renderPatientsList(filtered);
+        });
+
+        // Al cargar la página, se muestra la vista de "Inicio" por defecto
+        document.addEventListener('DOMContentLoaded', () => {
+            showView('inicio-view');
+        });
+    </script>
+</body>
+</html>

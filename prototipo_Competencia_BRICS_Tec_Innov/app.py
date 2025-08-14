@@ -1,82 +1,104 @@
-from flask import Flask, render_template, request, redirect, session
-import json, os
-from datetime import datetime
-from blockchain import Blockchain
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+import json
+import hashlib
+import time
 
 app = Flask(__name__)
-app.secret_key = 'clave_secreta'
+app.secret_key = "supersecreto123"
 
-blockchain = Blockchain()
-
+# =======================
+# Funciones de usuario
+# =======================
 def cargar_usuarios():
-    if not os.path.exists('usuarios.json'):
-        return []
-    with open('usuarios.json', 'r') as f:
+    with open("usuarios.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
-def guardar_usuarios(usuarios):
-    with open('usuarios.json', 'w') as f:
-        json.dump(usuarios, f, indent=2)
+def verificar_usuario(usuario, clave):
+    usuarios = cargar_usuarios()
+    clave_hash = hashlib.sha256(clave.encode()).hexdigest()
+    for u in usuarios:
+        if u['usuario'] == usuario and hashlib.sha256(u['clave'].encode()).hexdigest() == clave_hash:
+            return u
+    return None
 
+# =======================
+# Blockchain simulado
+# =======================
+def cargar_blockchain():
+    try:
+        with open("blockchain.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return []
+
+def guardar_blockchain(chain):
+    with open("blockchain.json", "w", encoding="utf-8") as f:
+        json.dump(chain, f, indent=4)
+
+def registrar_login_blockchain(usuario):
+    chain = cargar_blockchain()
+    timestamp = time.time()
+    # Simple hash del bloque anterior
+    previous_hash = chain[-1]['hash'] if chain else "0"*64
+    block_data = f"{usuario}{timestamp}{previous_hash}".encode()
+    block_hash = hashlib.sha256(block_data).hexdigest()
+    bloque = {
+        "usuario": usuario,
+        "timestamp": timestamp,
+        "previous_hash": previous_hash,
+        "hash": block_hash
+    }
+    chain.append(bloque)
+    guardar_blockchain(chain)
+
+# =======================
+# Rutas
+# =======================
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         usuario = request.form["usuario"]
         clave = request.form["clave"]
-        usuarios = cargar_usuarios()
-        for u in usuarios:
-            if u["usuario"] == usuario and u["clave"] == clave:
-                session["usuario"] = u["usuario"]
-                session["roles"] = u.get("roles", [u.get("rol")])
-                return redirect("/seleccionar_rol")
-        return "Credenciales incorrectas"
-    return render_template("login.html")
+        user = verificar_usuario(usuario, clave)
+        if user:
+            # Registrar login en blockchain
+            registrar_login_blockchain(usuario)
+            
+            # Guardar en sesión
+            session["usuario"] = user["usuario"]
+            session["roles"] = user["roles"]
+            flash(f"¡Bienvenido {user['usuario']}!", "success")
 
-@app.route("/seleccionar_rol")
-def seleccionar_rol():
-    if "usuario" not in session or "roles" not in session:
-        return redirect("/")
-    return render_template("seleccionar_rol.html", roles=session["roles"])
+            # Redirigir según rol
+            if "profesional" in user["roles"]:
+                return redirect(url_for("panel_profesional"))
+            elif "paciente" in user["roles"]:
+                return redirect(url_for("panel_paciente"))
+        else:
+            flash("Usuario o clave incorrectos", "error")
+            return redirect(url_for("login"))
+    return render_template("login.html")
 
 @app.route("/panel_paciente")
 def panel_paciente():
-    if "usuario" not in session or "paciente" not in session["roles"]:
-        return redirect("/")
-    usuarios = cargar_usuarios()
-    usuario = next((u for u in usuarios if u["usuario"] == session["usuario"]), {})
-    return render_template("panel_paciente.html", usuario=usuario)
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+    if "paciente" not in session["roles"]:
+        return "Acceso denegado"
+    return render_template("panel_paciente.html", usuario=session["usuario"])
 
 @app.route("/panel_profesional")
 def panel_profesional():
-    if "usuario" not in session or "profesional" not in session["roles"]:
-        return redirect("/")
-    return render_template("panel_profesional.html")
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+    if "profesional" not in session["roles"]:
+        return "Acceso denegado"
+    return render_template("panel_profesional.html", usuario=session["usuario"])
 
-@app.route("/registrar_observacion", methods=["GET", "POST"])
-def registrar_observacion():
-    if "usuario" not in session or "profesional" not in session["roles"]:
-        return redirect("/")
-
-    usuarios = cargar_usuarios()
-    pacientes = [
-    {"usuario": u["usuario"], "dni": u["dni"]}
-    for u in usuarios if "paciente" in u.get("roles", [])
-]
-
-    if request.method == "POST":
-        data = {
-            "profesional": session["usuario"],
-            "paciente": request.form["paciente"],
-            "sintomas": request.form["sintomas"],
-            "diagnostico": request.form["diagnostico"],
-            "lugar": request.form["lugar"],
-            "notas": request.form["notas"],
-            "fecha": datetime.now().isoformat()
-        }
-        blockchain.agregar_bloque(data)
-        return redirect("/panel_profesional")
-
-    return render_template("registrar_observacion.html", pacientes=pacientes)
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
 if __name__ == "__main__":
     app.run(debug=True)
