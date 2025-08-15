@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     Paciente, Profesional, Alergia, CondicionMedica, 
     Medicamento, Tratamiento, Antecedente, PruebaLaboratorio, 
-    Cirugia, Turno
+    Cirugia, Turno, ChatMessage
 )
 
 @admin.register(Paciente)
@@ -71,3 +71,24 @@ class TurnoAdmin(admin.ModelAdmin):
     search_fields = ['paciente__user__first_name', 'paciente__user__last_name']
     list_filter = ['estado', 'fecha_hora', 'profesional__especialidad']
     date_hierarchy = 'fecha_hora'
+    
+@admin.register(ChatMessage)
+class ChatMessageAdmin(admin.ModelAdmin):
+    """
+    Administración de mensajes de chat
+    """
+    list_display = ('created_at', 'user_message_preview', 'ai_response_preview', 'session_key')
+    list_filter = ('created_at',)
+    search_fields = ('user_message', 'ai_response')
+    readonly_fields = ('created_at',)
+    ordering = ('-created_at',)
+    
+    def user_message_preview(self, obj):
+        """Mostrar preview del mensaje del usuario"""
+        return obj.user_message[:50] + '...' if len(obj.user_message) > 50 else obj.user_message
+    user_message_preview.short_description = 'Mensaje Usuario'
+    
+    def ai_response_preview(self, obj):
+        """Mostrar preview de la respuesta de la IA"""
+        return obj.ai_response[:50] + '...' if len(obj.ai_response) > 50 else obj.ai_response
+    ai_response_preview.short_description = 'Respuesta IA'

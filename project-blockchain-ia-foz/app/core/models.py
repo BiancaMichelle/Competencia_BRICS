@@ -225,3 +225,23 @@ class Turno(models.Model):
     
     class Meta:
         ordering = ['fecha_hora']
+        
+
+# modelo para el chat
+class ChatMessage(models.Model):
+    """
+    Modelo para almacenar mensajes del chat (opcional)
+    Este modelo se puede usar si quieres guardar el historial de conversaciones
+    """
+    user_message = models.TextField(help_text="Mensaje del usuario")
+    ai_response = models.TextField(help_text="Respuesta de la IA")
+    created_at = models.DateTimeField(default=timezone.now)
+    session_key = models.CharField(max_length=40, null=True, blank=True, help_text="ID de sesión del usuario")
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Mensaje de Chat"
+        verbose_name_plural = "Mensajes de Chat"
+    
+    def __str__(self):
+        return f"Chat - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
