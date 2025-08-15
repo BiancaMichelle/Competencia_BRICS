@@ -1,0 +1,87 @@
+<!-- Vista de Inicio del Profesional (visible por defecto) -->
+<div id="inicio-view" class="bg-white p-8 rounded-2xl shadow-lg">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Bienvenido, Dr/a. {{ profesional.user.first_name }} {{ profesional.user.last_name }}</h1>
+    <p class="text-gray-600 mb-8">
+        Especialidad: {{ profesional.get_especialidad_display }} | Matrícula: {{ profesional.matricula }}
+    </p>
+    
+    <!-- Estadísticas Rápidas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Tarjeta de Turnos de Hoy -->
+        <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 shadow-md">
+            <h2 class="text-xl font-bold text-blue-800 mb-2">Turnos de Hoy</h2>
+            <p class="text-gray-700 text-lg"><span class="font-bold">{{ turnos_hoy|length }}</span> paciente{{ turnos_hoy|length|pluralize }}</p>
+        </div>
+        
+        <!-- Tarjeta de Próximos Turnos -->
+        <div class="bg-green-50 p-6 rounded-xl border border-green-200 shadow-md">
+            <h2 class="text-xl font-bold text-green-800 mb-2">Próximos Turnos</h2>
+            <p class="text-gray-700 text-lg"><span class="font-bold">{{ turnos_proximos|length }}</span> agendado{{ turnos_proximos|length|pluralize }}</p>
+        </div>
+        
+        <!-- Tarjeta de Pacientes Recientes -->
+        <div class="bg-purple-50 p-6 rounded-xl border border-purple-200 shadow-md">
+            <h2 class="text-xl font-bold text-purple-800 mb-2">Pacientes Recientes</h2>
+            <p class="text-gray-700 text-lg"><span class="font-bold">{{ pacientes_recientes|length }}</span> en el último mes</p>
+        </div>
+    </div>
+
+    <!-- Turnos de Hoy - Detalle -->
+    {% if turnos_hoy %}
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Agenda de Hoy</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for turno in turnos_hoy %}
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-blue-800">{{ turno.paciente.user.first_name }} {{ turno.paciente.user.last_name }}</h3>
+                        <span class="text-sm text-blue-600">{{ turno.fecha_hora|time:"H:i" }}</span>
+                    </div>
+                    <p class="text-gray-700 text-sm">{{ turno.motivo|truncatechars:50 }}</p>
+                    <p class="text-gray-600 text-xs mt-1">Tel: {{ turno.paciente.telefono }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Accesos Rápidos -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Accesos Rápidos</h3>
+            <div class="space-y-3">
+                <a href="{% url 'core:buscar_pacientes' %}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg transition-colors duration-300">
+                    Buscar Pacientes
+                </a>
+                <a href="#" onclick="showView('turnos-view')" class="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-2 px-4 rounded-lg transition-colors duration-300">
+                    Ver Calendario
+                </a>
+                <a href="#" onclick="showView('pacientes-view')" class="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center py-2 px-4 rounded-lg transition-colors duration-300">
+                    Lista de Pacientes
+                </a>
+            </div>
+        </div>
+
+        <!-- Próximos Turnos -->
+        {% if turnos_proximos %}
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Próximos Turnos</h3>
+            <div class="space-y-2 max-h-48 overflow-y-auto">
+                {% for turno in turnos_proximos|slice:":5" %}
+                    <div class="text-sm">
+                        <span class="font-semibold">{{ turno.fecha_hora|date:"d/m" }}</span> - 
+                        <span class="text-gray-600">{{ turno.fecha_hora|time:"H:i" }}</span>
+                        <br>
+                        <span class="text-gray-800">{{ turno.paciente.user.first_name }} {{ turno.paciente.user.last_name }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Próximos Turnos</h3>
+            <p class="text-gray-500">No hay turnos programados</p>
+        </div>
+        {% endif %}
+    </div>
+</div>

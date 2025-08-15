@@ -1,0 +1,59 @@
+<!-- Utilidades JavaScript comunes para el panel profesional -->
+<script>
+// Función para mostrar/ocultar vistas
+function showView(viewId) {
+    // Ocultar todas las vistas
+    const views = ['inicio-view', 'turnos-view', 'pacientes-view'];
+    views.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.classList.add('hidden');
+        }
+    });
+    
+    // Mostrar la vista seleccionada
+    const targetView = document.getElementById(viewId);
+    if (targetView) {
+        targetView.classList.remove('hidden');
+    }
+    
+    // Si es la vista de turnos, cargar los datos
+    if (viewId === 'turnos-view') {
+        cargarTurnos();
+    }
+}
+
+// Función auxiliar para obtener el token CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Función para mostrar notificaciones (se puede mejorar con una librería)
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    // Por ahora usamos alert, pero se puede mejorar con toast notifications
+    switch(tipo) {
+        case 'success':
+            alert('✅ ' + mensaje);
+            break;
+        case 'error':
+            alert('❌ ' + mensaje);
+            break;
+        case 'warning':
+            alert('⚠️ ' + mensaje);
+            break;
+        default:
+            alert('ℹ️ ' + mensaje);
+    }
+}
+</script>
