@@ -1,0 +1,204 @@
+<!-- JavaScript para el Calendario de Turnos -->
+{% include 'js/panel_profesional_utils.html' %}
+
+<script>
+// Función para cargar turnos del día seleccionado
+function cargarTurnos() {
+    const fechaInput = document.getElementById('fecha-filtro');
+    const turnosContainer = document.getElementById('turnos-container');
+    
+    if (!fechaInput || !turnosContainer) return;
+    
+    const fechaSeleccionada = fechaInput.value;
+    
+    // Mostrar mensaje de carga
+    turnosContainer.innerHTML = '<div class="col-span-full text-center py-8"><p class="text-gray-500">Cargando turnos...</p></div>';
+    
+    // Hacer petición AJAX para obtener turnos del día
+    fetch(`/panel-profesional/turnos/?fecha=${fechaSeleccionada}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        mostrarTurnos(data.turnos || []);
+    })
+    .catch(error => {
+        console.error('Error al cargar turnos:', error);
+        turnosContainer.innerHTML = '<div class="col-span-full text-center py-8"><p class="text-red-500">Error al cargar los turnos</p></div>';
+    });
+}
+
+// Función para mostrar los turnos en el DOM
+function mostrarTurnos(turnos) {
+    const turnosContainer = document.getElementById('turnos-container');
+    
+    if (turnos.length === 0) {
+        turnosContainer.innerHTML = `
+            <div class="col-span-full text-center py-8">
+                <p class="text-gray-500 text-lg">No hay turnos programados para esta fecha</p>
+                <p class="text-gray-400">Selecciona otra fecha para ver más turnos</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let turnosHTML = '';
+    turnos.forEach(turno => {
+        const fechaHora = new Date(turno.fecha_hora);
+        const hora = fechaHora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        
+        // Determinar el color del estado
+        let estadoClass = 'bg-gray-100 text-gray-800';
+        let estadoTexto = turno.estado;
+        
+        switch(turno.estado) {
+            case 'programado':
+                estadoClass = 'bg-blue-100 text-blue-800';
+                estadoTexto = 'Programado';
+                break;
+            case 'confirmado':
+                estadoClass = 'bg-green-100 text-green-800';
+                estadoTexto = 'Confirmado';
+                break;
+            case 'en_curso':
+                estadoClass = 'bg-yellow-100 text-yellow-800';
+                estadoTexto = 'En Curso';
+                break;
+            case 'finalizado':
+                estadoClass = 'bg-purple-100 text-purple-800';
+                estadoTexto = 'Finalizado';
+                break;
+            case 'cancelado':
+                estadoClass = 'bg-red-100 text-red-800';
+                estadoTexto = 'Cancelado';
+                break;
+            case 'no_asistio':
+                estadoClass = 'bg-orange-100 text-orange-800';
+                estadoTexto = 'No Asistió';
+                break;
+        }
+        
+        // Determinar qué botones mostrar según el estado
+        let botonesHTML = '';
+        if (turno.estado === 'programado' || turno.estado === 'confirmado') {
+            botonesHTML = `
+                <div class="mt-4 flex space-x-2">
+                    <button onclick="marcarAtendido(${turno.id})" class="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm py-2 px-3 rounded-lg transition-colors duration-300">
+                        Finalizar Turno
+                    </button>
+                    <button onclick="reprogramarTurno(${turno.id})" class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white text-sm py-2 px-3 rounded-lg transition-colors duration-300">
+                        Reprogramar
+                    </button>
+                </div>
+            `;
+        } else if (turno.estado === 'finalizado') {
+            botonesHTML = `
+                <div class="mt-4">
+                    <span class="text-sm text-gray-500">Turno completado</span>
+                </div>
+            `;
+        } else {
+            botonesHTML = `
+                <div class="mt-4">
+                    <span class="text-sm text-gray-500">Estado: ${estadoTexto}</span>
+                </div>
+            `;
+        }
+        
+        turnosHTML += `
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="text-lg font-bold text-gray-800">${turno.paciente_nombre}</h3>
+                    <div class="flex flex-col items-end space-y-1">
+                        <span class="text-sm font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded">${hora}</span>
+                        <span class="text-xs px-2 py-1 rounded ${estadoClass}">${estadoTexto}</span>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-gray-600 text-sm"><strong>C.I.:</strong> ${turno.paciente_cedula}</p>
+                    <p class="text-gray-600 text-sm"><strong>Teléfono:</strong> ${turno.paciente_telefono}</p>
+                    <p class="text-gray-700 text-sm"><strong>Motivo:</strong> ${turno.motivo}</p>
+                </div>
+                ${botonesHTML}
+            </div>
+        `;
+    });
+    
+    turnosContainer.innerHTML = turnosHTML;
+}
+
+// Función para marcar turno como atendido
+function marcarAtendido(turnoId) {
+    if (!confirm('¿Está seguro de marcar este turno como finalizado?')) return;
+    
+    fetch(`/panel-profesional/turnos/${turnoId}/atender/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarNotificacion('Turno marcado como finalizado', 'success');
+            cargarTurnos(); // Recargar turnos
+        } else {
+            mostrarNotificacion('Error al marcar el turno: ' + (data.error || 'Error desconocido'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarNotificacion('Error al marcar el turno como finalizado', 'error');
+    });
+}
+
+// Función para reprogramar turno
+function reprogramarTurno(turnoId) {
+    const nuevaFecha = prompt('Ingrese la nueva fecha y hora (YYYY-MM-DD HH:MM):');
+    if (!nuevaFecha) return;
+    
+    fetch(`/panel-profesional/turnos/${turnoId}/reprogramar/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ nueva_fecha_hora: nuevaFecha })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarNotificacion('Turno reprogramado exitosamente', 'success');
+            cargarTurnos(); // Recargar turnos
+        } else {
+            mostrarNotificacion('Error al reprogramar el turno: ' + (data.error || 'Error desconocido'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarNotificacion('Error al reprogramar el turno', 'error');
+    });
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Agregar event listener al filtro de fecha
+    const fechaFiltro = document.getElementById('fecha-filtro');
+    if (fechaFiltro) {
+        fechaFiltro.addEventListener('change', cargarTurnos);
+    }
+    
+    // Cargar turnos si estamos en la vista de turnos
+    const turnosView = document.getElementById('turnos-view');
+    if (turnosView && !turnosView.classList.contains('hidden')) {
+        cargarTurnos();
+    }
+});
+</script>
