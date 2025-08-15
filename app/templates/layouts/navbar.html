@@ -15,6 +15,7 @@
             <!-- Enlaces de Navegación del Paciente -->
             <div class="flex items-center space-x-4">
                 <a href="{% url 'core:index' %}" onclick="showView('inicio-view')" id="nav-inicio" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Inicio</a>
+                <a href="{% url 'core:chat_home' %}" onclick="showView('chat-view')" id="nav-chat" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Chat</a>
                 <a href="#" onclick="showView('turnos-view')" id="nav-turnos" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Mis Turnos</a>
                 <a href="#" onclick="showView('historial-view')" id="nav-historial" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Mi Historial Médico</a>
                 
