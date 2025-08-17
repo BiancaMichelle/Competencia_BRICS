@@ -105,15 +105,15 @@ class AlergiaForm(forms.ModelForm):
 class CondicionMedicaForm(forms.ModelForm):
     class Meta:
         model = CondicionMedica
-        fields = ['nombre', 'descripcion', 'fecha_diagnostico', 'estado']
+        fields = ['codigo', 'descripcion', 'fecha_diagnostico', 'estado']
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Diabetes tipo 2'}),
+            'codigo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: E11 - Diabetes tipo 2'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'fecha_diagnostico': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'estado': forms.Select(attrs={'class': 'form-control'}),
         }
         labels = {
-            'nombre': 'Condición Médica',
+            'codigo': 'Código/Nombre de la Condición',
             'descripcion': 'Descripción',
             'fecha_diagnostico': 'Fecha de Diagnóstico',
             'estado': 'Estado Actual',
@@ -302,21 +302,4 @@ class BlockchainRecordForm(forms.Form):
         help_text='Ingrese los datos en formato JSON'
     )
 
-
-class BlockchainTransactionForm(forms.Form):
-    """Formulario para crear transacciones en blockchain"""
-    from_address = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dirección de origen'}),
-        label='Dirección de Origen'
-    )
-    to_address = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dirección de destino'}),
-        label='Dirección de Destino'
-    )
-    data = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-        label='Datos de la Transacción (JSON)',
-        help_text='Ingrese los datos de la transacción en formato JSON'
-    )
+# BlockchainTransactionForm ELIMINADO - No se usaba en el sistema

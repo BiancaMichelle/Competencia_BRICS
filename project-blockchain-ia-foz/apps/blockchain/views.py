@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import login
 from django.contrib import messages
 from django.http import JsonResponse
@@ -11,13 +12,19 @@ import json
 from .models import (
     Paciente, Profesional, Alergia, CondicionMedica, 
     Medicamento, Tratamiento, Antecedente, PruebaLaboratorio, 
-    Cirugia, Block, MedicalRecord, BlockchainTransaction
+    Cirugia, Block, BlockchainHash, BlockchainService
 )
+# BlockchainTransaction ELIMINADO - No se usaba
+# Importamos los formularios
 from .forms import (
     PacienteForm, PacienteRegistroForm, ProfesionalForm, ProfesionalRegistroForm, AlergiaForm, 
     CondicionMedicaForm, TratamientoForm, AntecedenteForm, 
     PruebaLaboratorioForm, CirugiaForm, BuscarPacienteForm
 )
+
+# Función auxiliar para verificar superusuario
+def is_superuser(user):
+    return user.is_superuser
 
 
 @login_required
@@ -180,16 +187,21 @@ def agregar_alergia(request, paciente_id):
         alergia.save()
         
         # Crear registro en blockchain
-        medical_record = MedicalRecord.objects.create(
-            paciente=paciente,
-            tipo_registro='alergia',
-            contenido=json.dumps({
+        blockchain_service = BlockchainService()
+        blockchain_data = {
+            'paciente_id': paciente.id,
+            'tipo_registro': 'alergia',
+            'contenido': {
                 'sustancia': alergia.sustancia,
                 'descripcion': alergia.descripcion,
                 'severidad': alergia.severidad,
                 'fecha_diagnostico': str(alergia.fecha_diagnostico)
-            })
-        )
+            },
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        # Crear hash y almacenar en blockchain
+        hash_record = blockchain_service.create_hash(json.dumps(blockchain_data, ensure_ascii=False))
         
         messages.success(request, 'Alergia agregada exitosamente.')
         return JsonResponse({
@@ -217,16 +229,21 @@ def agregar_condicion(request, paciente_id):
         condicion.save()
         
         # Crear registro en blockchain
-        medical_record = MedicalRecord.objects.create(
-            paciente=paciente,
-            tipo_registro='condicion_medica',
-            contenido=json.dumps({
-                'nombre': condicion.nombre,
+        blockchain_service = BlockchainService()
+        blockchain_data = {
+            'paciente_id': paciente.id,
+            'tipo_registro': 'condicion_medica',
+            'contenido': {
+                'codigo': condicion.codigo,
                 'descripcion': condicion.descripcion,
                 'fecha_diagnostico': str(condicion.fecha_diagnostico),
                 'estado': condicion.estado
-            })
-        )
+            },
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        # Crear hash y almacenar en blockchain
+        hash_record = blockchain_service.create_hash(json.dumps(blockchain_data, ensure_ascii=False))
         
         messages.success(request, 'Condición médica agregada exitosamente.')
         return JsonResponse({
@@ -264,18 +281,23 @@ def agregar_tratamiento(request, paciente_id):
         tratamiento.save()
         
         # Crear registro en blockchain
-        medical_record = MedicalRecord.objects.create(
-            paciente=paciente,
-            tipo_registro='tratamiento',
-            contenido=json.dumps({
+        blockchain_service = BlockchainService()
+        blockchain_data = {
+            'paciente_id': paciente.id,
+            'tipo_registro': 'tratamiento',
+            'contenido': {
                 'descripcion': tratamiento.descripcion,
                 'dosis': tratamiento.dosis,
                 'frecuencia': tratamiento.frecuencia,
                 'fecha_inicio': str(tratamiento.fecha_inicio),
                 'profesional': str(profesional),
                 'medicamento': str(tratamiento.medicamento) if tratamiento.medicamento else None
-            })
-        )
+            },
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        # Crear hash y almacenar en blockchain
+        hash_record = blockchain_service.create_hash(json.dumps(blockchain_data, ensure_ascii=False))
         
         messages.success(request, 'Tratamiento agregado exitosamente.')
         return JsonResponse({
@@ -319,8 +341,9 @@ def registro_paciente(request):
     })
 
 
+@user_passes_test(is_superuser)
 def registro_profesional(request):
-    """Registro de nuevo profesional"""
+    """Registro de nuevo profesional - Solo accesible para superadmin"""
     if request.method == 'POST':
         user_form = ProfesionalRegistroForm(request.POST)
         profesional_form = ProfesionalForm(request.POST)
@@ -329,19 +352,22 @@ def registro_profesional(request):
             # Crear el usuario
             user = user_form.save()
             
+            # Asignar al grupo de profesionales
+            profesional_group, created = Group.objects.get_or_create(name='Profesionales')
+            user.groups.add(profesional_group)
+            
             # Crear el profesional asociado al usuario
             profesional = profesional_form.save(commit=False)
             profesional.user = user
             profesional.save()
             
-            login(request, user)
-            messages.success(request, '¡Registro exitoso! Bienvenido al sistema.')
-            return redirect('blockchain:panel_profesional')
+            messages.success(request, 'Profesional registrado exitosamente por el administrador.')
+            return redirect('blockchain:dashboard')  # Redirigir al dashboard de admin
     else:
         user_form = ProfesionalRegistroForm()
         profesional_form = ProfesionalForm()
     
-    return render(request, 'registration/registro_profesional.html', {
+    return render(request, 'blockchain/admin/registro_profesional.html', {
         'user_form': user_form,
         'profesional_form': profesional_form
     })
@@ -352,41 +378,137 @@ def registro_profesional(request):
 @login_required
 def blockchain_dashboard(request):
     """Dashboard principal del módulo blockchain"""
+    from datetime import datetime, timedelta
+    from django.db.models import Count
+    
+    # Estadísticas principales
+    total_pacientes = Paciente.objects.count()
+    total_hashes = BlockchainHash.objects.count()
+    total_profesionales = Profesional.objects.count()
+    
+    # Registros médicos totales (suma de todos los tipos)
+    total_alergias = Alergia.objects.count()
+    total_condiciones = CondicionMedica.objects.count()
+    total_tratamientos = Tratamiento.objects.count()
+    total_pruebas = PruebaLaboratorio.objects.count()
+    total_cirugias = Cirugia.objects.count()
+    total_registros_medicos = total_alergias + total_condiciones + total_tratamientos + total_pruebas + total_cirugias
+    
+    # Pacientes nuevos este mes
+    mes_actual = datetime.now().replace(day=1)
+    nuevos_pacientes_mes = Paciente.objects.filter(user__date_joined__gte=mes_actual).count()
+    
+    # Hashes blockchain recientes
+    recent_hashes = BlockchainHash.objects.all().order_by('-timestamp')[:10]
+    
+    # Verificar integridad de la cadena
+    from .models import BlockchainService
+    is_valid, message = BlockchainService.verify_chain_integrity()
+    integridad_cadena = "Cadena íntegra" if is_valid else f"Error: {message}"
+    
+    # Hashes verificados
+    hashes_verificados = BlockchainHash.objects.filter(is_verified=True).count()
+    
+    # Último hash
+    ultimo_hash_obj = BlockchainHash.objects.order_by('-timestamp').first()
+    ultimo_hash = ultimo_hash_obj.hash_value if ultimo_hash_obj else None
+    
+    # Actividad reciente (simulada - puedes expandir esto)
+    actividad_reciente = []
+    
+    # Añadir actividad de pacientes recientes
+    pacientes_recientes = Paciente.objects.order_by('-user__date_joined')[:3]
+    for paciente in pacientes_recientes:
+        actividad_reciente.append({
+            'titulo': f'Nuevo paciente registrado',
+            'descripcion': f'{paciente.get_full_name()} se registró en el sistema',
+            'timestamp': paciente.user.date_joined
+        })
+    
+    # Añadir actividad de hashes recientes
+    hashes_recientes_actividad = BlockchainHash.objects.order_by('-timestamp')[:3]
+    for hash_obj in hashes_recientes_actividad:
+        actividad_reciente.append({
+            'titulo': f'Hash blockchain creado',
+            'descripcion': f'Nuevo hash para {hash_obj.content_type} ID:{hash_obj.object_id}',
+            'timestamp': hash_obj.timestamp
+        })
+    
+    # Ordenar actividad por timestamp
+    actividad_reciente.sort(key=lambda x: x['timestamp'], reverse=True)
+    actividad_reciente = actividad_reciente[:5]  # Limitar a 5 elementos
+    
     context = {
+        'total_pacientes': total_pacientes,
+        'total_hashes': total_hashes,
+        'total_profesionales': total_profesionales,
+        'total_registros_medicos': total_registros_medicos,
+        'nuevos_pacientes_mes': nuevos_pacientes_mes,
+        'recent_hashes': recent_hashes,
+        'integridad_cadena': integridad_cadena,
+        'hashes_verificados': hashes_verificados,
+        'ultimo_hash': ultimo_hash,
+        'actividad_reciente': actividad_reciente,
         'total_blocks': Block.objects.count(),
-        'total_records': MedicalRecord.objects.count(),
-        'recent_blocks': Block.objects.all().order_by('-timestamp')[:5],
-        'recent_records': MedicalRecord.objects.all().order_by('-timestamp')[:10],
     }
     return render(request, 'blockchain/dashboard.html', context)
 
 
 @login_required
 def verify_blockchain(request):
-    """Verificar la integridad de la blockchain"""
-    blocks = Block.objects.all().order_by('index')
-    is_valid = True
+    """Verificar la integridad de la blockchain usando BlockchainHash"""
+    from django.http import JsonResponse
     
-    for i, block in enumerate(blocks):
-        if i == 0:  # Genesis block
-            if block.previous_hash != "0":
-                is_valid = False
-                break
-        else:
-            previous_block = blocks[i-1]
-            if block.previous_hash != previous_block.hash:
-                is_valid = False
-                break
-            
-            if block.hash != block.calculate_hash():
-                is_valid = False
-                break
+    try:
+        # Verificar integridad usando el servicio
+        is_valid, message = BlockchainService.verify_chain_integrity()
+        
+        # Estadísticas adicionales
+        total_hashes = BlockchainHash.objects.count()
+        hashes_verificados = BlockchainHash.objects.filter(is_verified=True).count()
+        
+        return JsonResponse({
+            'is_valid': is_valid,
+            'total_hashes': total_hashes,
+            'hashes_verificados': hashes_verificados,
+            'message': message
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'is_valid': False,
+            'error': str(e),
+            'message': 'Error al verificar la blockchain'
+        }, status=500)
+
+
+@login_required
+def blockchain_hashes_list(request):
+    """Lista completa de hashes blockchain"""
+    hashes = BlockchainHash.objects.all().order_by('-timestamp')
     
-    return JsonResponse({
-        'is_valid': is_valid,
-        'total_blocks': blocks.count(),
-        'message': 'Blockchain válida' if is_valid else 'Blockchain comprometida'
-    })
+    # Filtros opcionales
+    content_type = request.GET.get('type')
+    if content_type:
+        hashes = hashes.filter(content_type=content_type)
+    
+    # Paginación
+    from django.core.paginator import Paginator
+    paginator = Paginator(hashes, 20)  # 20 hashes por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Tipos disponibles para filtro
+    content_types = BlockchainHash.objects.values_list('content_type', flat=True).distinct()
+    
+    context = {
+        'page_obj': page_obj,
+        'content_types': content_types,
+        'selected_type': content_type,
+        'total_hashes': hashes.count(),
+    }
+    
+    return render(request, 'blockchain/hashes_list.html', context)
 
 
 @login_required
@@ -394,18 +516,25 @@ def get_patient_blockchain_history(request, paciente_id):
     """Obtener historial blockchain de un paciente"""
     try:
         paciente = Paciente.objects.get(id=paciente_id)
-        records = MedicalRecord.objects.filter(paciente=paciente).order_by('-timestamp')
+        # Buscar hashes relacionados con este paciente
+        records = BlockchainHash.objects.filter(
+            data__contains=f'"paciente_id": {paciente_id}'
+        ).order_by('-timestamp')
         
         history = []
         for record in records:
-            history.append({
-                'id': record.id,
-                'tipo': record.tipo_registro,
-                'timestamp': record.timestamp.isoformat(),
-                'hash': record.hash_registro,
-                'verificado': record.verificado,
-                'block_index': record.block.index if record.block else None
-            })
+            try:
+                data_dict = json.loads(record.data) if isinstance(record.data, str) else record.data
+                history.append({
+                    'id': record.id,
+                    'tipo': data_dict.get('tipo_registro', 'desconocido'),
+                    'timestamp': record.timestamp.isoformat(),
+                    'hash': record.hash_value,
+                    'verificado': record.verified,
+                    'data': data_dict.get('contenido', {})
+                })
+            except json.JSONDecodeError:
+                continue
         
         return JsonResponse({
             'success': True,
