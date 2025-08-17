@@ -1,0 +1,190 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %}Iniciar sesión{% endblock %}
+
+
+{% block content %}
+<div class="relative min-h-screen flex items-center justify-center bg-base-200 overflow-hidden">
+   <!-- Canvas para el fondo animado de partículas -->
+   <canvas id="login-canvas" class="absolute inset-0"></canvas>
+
+    <!-- Contenedor principal del formulario de login -->
+    <div class="relative z-10 card bg-base-100 shadow-2xl w-full max-w-sm mx-4">
+        <div class="card-body">
+            <!-- Logo de ARQA -->
+            <div class="flex flex-col items-center mb-6">
+                <img src="{% static 'img/logo.jpg' %}" alt="ARQA Logo" class="h-20 w-auto mb-4 rounded-lg">
+                <h1 class="text-2xl font-bold text-primary">ARQA</h1>
+            </div>
+
+            <!-- Título del formulario -->
+            <h2 class="text-xl font-semibold text-center mb-6">
+                Iniciar Sesión
+            </h2>
+
+            <!-- Mensajes de error -->
+            {% if form.errors %}
+                <div class="alert alert-error mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Usuario o contraseña incorrectos</span>
+                </div>
+            {% endif %}
+
+            <!-- Formulario de inicio de sesión -->
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                
+                <!-- Campo de usuario -->
+                <div class="form-control">
+                    <label class="label" for="{{ form.username.id_for_label }}">
+                        <span class="label-text">Nombre de Usuario</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="{{ form.username.name }}" 
+                        id="{{ form.username.id_for_label }}"
+                        placeholder="Ingresa tu usuario"
+                        class="input input-bordered w-full {% if form.username.errors %}input-error{% endif %}"
+                        value="{{ form.username.value|default:'' }}"
+                        required
+                    />
+                    {% if form.username.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ form.username.errors.0 }}</span>
+                        </label>
+                    {% endif %}
+                </div>
+
+                <!-- Campo de contraseña -->
+                <div class="form-control">
+                    <label class="label" for="{{ form.password.id_for_label }}">
+                        <span class="label-text">Contraseña</span>
+                    </label>
+                    <input 
+                        type="password" 
+                        name="{{ form.password.name }}" 
+                        id="{{ form.password.id_for_label }}"
+                        placeholder="Ingresa tu contraseña"
+                        class="input input-bordered w-full {% if form.password.errors %}input-error{% endif %}"
+                        required
+                    />
+                    {% if form.password.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ form.password.errors.0 }}</span>
+                        </label>
+                    {% endif %}
+                </div>
+
+                <!-- Botón de submit -->
+                <div class="form-control mt-6">
+                    <button type="submit" class="btn btn-primary w-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                        </svg>
+                        Ingresar
+                    </button>
+                </div>
+            </form>
+
+            <!-- Enlace para crear cuenta (opcional) -->
+            <div class="divider"></div>
+            <div class="text-center">
+                <p class="text-sm text-base-content/60">¿No tienes cuenta?</p>
+                <a href="#" class="link link-primary text-sm">Contacta al administrador</a>
+            </div>
+        </div>
+    </div>
+</div
+    <!-- Script para la animación de fondo -->
+    <script>
+        const canvas = document.getElementById('login-canvas');
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+        const numParticles = 80;
+        const connectionDistance = 120;
+
+        // Función para ajustar el tamaño del canvas al de la ventana
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        // Partícula
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Si la partícula sale de la pantalla, la reubicamos
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(255, 119, 198, 0.3)'; // Color synthwave
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Inicializar las partículas
+        function init() {
+            particles.length = 0;
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        // Conectar las partículas cercanas
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a; b < particles.length; b++) {
+                    const dx = particles[a].x - particles[b].x;
+                    const dy = particles[a].y - particles[b].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < connectionDistance) {
+                        opacityValue = 1 - (distance / connectionDistance);
+                        ctx.strokeStyle = `rgba(255, 119, 198, ${opacityValue * 0.2})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // Bucle de animación
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            connect();
+            requestAnimationFrame(animate);
+        }
+
+        // Iniciar la aplicación
+        window.onload = function() {
+            resizeCanvas();
+            init();
+            animate();
+        };
+
+        // Escuchar el evento de redimensionamiento de la ventana
+        window.addEventListener('resize', resizeCanvas);
+    </script>
+{% endblock %}

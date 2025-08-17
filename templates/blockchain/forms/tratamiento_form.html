@@ -1,0 +1,9 @@
+{% extends 'forms/base_form.html' %}
+
+{% block title %}Agregar Tratamiento{% endblock %}
+
+{% block form_title %}Agregar Nuevo Tratamiento{% endblock %}
+
+{% block submit_text %}Agregar Tratamiento{% endblock %}
+
+{% block cancel_url %}{% url 'blockchain:perfil_paciente' paciente.id %}{% endblock %}
