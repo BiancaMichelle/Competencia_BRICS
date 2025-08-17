@@ -1,0 +1,237 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %}Perfil paciente{% endblock %}
+
+{% block content %}
+        <!-- Header del Perfil -->
+        <div class="bg-white p-8 rounded-2xl shadow-lg mb-8">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                        {{ paciente.user.first_name }} {{ paciente.user.last_name }}
+                    </h1>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-600">
+                        <p><span class="font-semibold">C.I.:</span> {{ paciente.cedula }}</p>
+                        <p><span class="font-semibold">Edad:</span> {{ paciente.get_edad }} años</p>
+                        <p><span class="font-semibold">Tipo de Sangre:</span> {{ paciente.tipo_sangre|default:"No especificado" }}</p>
+                        <p><span class="font-semibold">Teléfono:</span> {{ paciente.telefono }}</p>
+                        <p><span class="font-semibold">Email:</span> {{ paciente.user.email }}</p>
+                    </div>
+                </div>
+                
+                {% if user.profesional %}
+                <div class="flex space-x-2">
+                    <a href="{% url 'blockchain:agregar_alergia' paciente.id %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                        + Alergia
+                    </a>
+                    <a href="{% url 'blockchain:agregar_condicion' paciente.id %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+                        + Condición
+                    </a>
+                    <a href="{% url 'blockchain:agregar_tratamiento' paciente.id %}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm">
+                        + Tratamiento
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Grid de Información Médica -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Alergias -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-xl font-bold text-red-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+                    Alergias
+                </h2>
+                {% if alergias %}
+                    <div class="space-y-3">
+                        {% for alergia in alergias %}
+                            <div class="p-3 bg-red-50 rounded-lg border border-red-200">
+                                <h3 class="font-semibold text-red-800">{{ alergia.sustancia }}</h3>
+                                <p class="text-sm text-gray-600">Severidad: {{ alergia.get_severidad_display }}</p>
+                                {% if alergia.descripcion %}
+                                    <p class="text-sm text-gray-700 mt-1">{{ alergia.descripcion }}</p>
+                                {% endif %}
+                                <p class="text-xs text-gray-500 mt-1">Diagnosticada: {{ alergia.fecha_diagnostico }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500">No hay alergias registradas</p>
+                {% endif %}
+            </div>
+
+            <!-- Condiciones Médicas -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-xl font-bold text-yellow-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
+                    Condiciones Médicas
+                </h2>
+                {% if condiciones %}
+                    <div class="space-y-3">
+                        {% for condicion in condiciones %}
+                            <div class="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                                <h3 class="font-semibold text-yellow-800">{{ condicion.nombre }}</h3>
+                                <p class="text-sm text-gray-600">Estado: {{ condicion.get_estado_display }}</p>
+                                {% if condicion.descripcion %}
+                                    <p class="text-sm text-gray-700 mt-1">{{ condicion.descripcion }}</p>
+                                {% endif %}
+                                <p class="text-xs text-gray-500 mt-1">Diagnosticada: {{ condicion.fecha_diagnostico }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500">No hay condiciones médicas registradas</p>
+                {% endif %}
+            </div>
+
+            <!-- Tratamientos Activos -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-xl font-bold text-green-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                    Tratamientos
+                </h2>
+                {% if tratamientos %}
+                    <div class="space-y-3">
+                        {% for tratamiento in tratamientos|slice:":5" %}
+                            <div class="p-3 {% if tratamiento.activo %}bg-green-50 border-green-200{% else %}bg-gray-50 border-gray-200{% endif %} rounded-lg border">
+                                <h3 class="font-semibold {% if tratamiento.activo %}text-green-800{% else %}text-gray-600{% endif %}">
+                                    {{ tratamiento.descripcion|truncatechars:50 }}
+                                </h3>
+                                {% if tratamiento.medicamento %}
+                                    <p class="text-sm text-gray-600">Medicamento: {{ tratamiento.medicamento.nombre }}</p>
+                                {% endif %}
+                                {% if tratamiento.dosis %}
+                                    <p class="text-sm text-gray-600">Dosis: {{ tratamiento.dosis }} - {{ tratamiento.frecuencia }}</p>
+                                {% endif %}
+                                <p class="text-xs text-gray-500 mt-1">
+                                    {% if tratamiento.activo %}Activo desde{% else %}Desde{% endif %}: {{ tratamiento.fecha_inicio }}
+                                    {% if tratamiento.fecha_fin %} hasta {{ tratamiento.fecha_fin }}{% endif %}
+                                </p>
+                                <p class="text-xs text-gray-500">Por: {{ tratamiento.profesional }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500">No hay tratamientos registrados</p>
+                {% endif %}
+            </div>
+
+            <!-- Antecedentes -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-xl font-bold text-purple-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-purple-500 rounded-full mr-2"></span>
+                    Antecedentes
+                </h2>
+                {% if antecedentes %}
+                    <div class="space-y-3">
+                        {% for antecedente in antecedentes %}
+                            <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                                <h3 class="font-semibold text-purple-800">{{ antecedente.get_tipo_display }}</h3>
+                                <p class="text-sm text-gray-700">{{ antecedente.descripcion }}</p>
+                                {% if antecedente.fecha_evento %}
+                                    <p class="text-xs text-gray-500 mt-1">Fecha: {{ antecedente.fecha_evento }}</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500">No hay antecedentes registrados</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sección de Pruebas y Cirugías -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            <!-- Pruebas de Laboratorio -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-xl font-bold text-blue-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                    Pruebas de Laboratorio
+                </h2>
+                {% if pruebas %}
+                    <div class="space-y-3">
+                        {% for prueba in pruebas|slice:":5" %}
+                            <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                <h3 class="font-semibold text-blue-800">{{ prueba.nombre_prueba }}</h3>
+                                <p class="text-sm text-gray-600">Fecha: {{ prueba.fecha_realizacion }}</p>
+                                <p class="text-sm text-gray-700 mt-1">{{ prueba.resultados|truncatechars:100 }}</p>
+                                <p class="text-xs text-gray-500 mt-1">Por: {{ prueba.profesional }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500">No hay pruebas registradas</p>
+                {% endif %}
+            </div>
+
+            <!-- Cirugías -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="w-3 h-3 bg-gray-500 rounded-full mr-2"></span>
+                    Cirugías
+                </h2>
+                {% if cirugias %}
+                    <div class="space-y-3">
+                        {% for cirugia in cirugias %}
+                            <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <h3 class="font-semibold text-gray-800">{{ cirugia.nombre_cirugia }}</h3>
+                                <p class="text-sm text-gray-600">Fecha: {{ cirugia.fecha_cirugia }}</p>
+                                <p class="text-sm text-gray-600">Estado: {{ cirugia.get_estado_display }}</p>
+                                {% if cirugia.descripcion %}
+                                    <p class="text-sm text-gray-700 mt-1">{{ cirugia.descripcion|truncatechars:100 }}</p>
+                                {% endif %}
+                                <p class="text-xs text-gray-500 mt-1">Por: {{ cirugia.profesional }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500">No hay cirugías registradas</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Blockchain Info (para futura implementación) -->
+        {% if user.profesional or es_propio_perfil %}
+        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl shadow-lg mt-8 border border-indigo-200">
+            <h2 class="text-xl font-bold text-indigo-800 mb-4 flex items-center">
+                <span class="w-3 h-3 bg-indigo-500 rounded-full mr-2"></span>
+                Información de Blockchain
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <span class="font-semibold text-indigo-700">Hash del Paciente:</span>
+                    <p class="text-indigo-600 font-mono text-xs break-all">{{ paciente.blockchain_hash|default:"Pendiente de generación" }}</p>
+                </div>
+                <div>
+                    <span class="font-semibold text-indigo-700">Último Bloque:</span>
+                    <p class="text-indigo-600 font-mono text-xs break-all">{{ paciente.ultimo_bloque_actualizado|default:"No sincronizado" }}</p>
+                </div>
+                <div>
+                    <span class="font-semibold text-indigo-700">Última Actualización:</span>
+                    <p class="text-indigo-600">{{ paciente.fecha_ultimo_hash|default:"Nunca" }}</p>
+                </div>
+                <div>
+                    <span class="font-semibold text-indigo-700">Estado:</span>
+                    <p class="text-indigo-600">
+                        {% if paciente.blockchain_hash %}
+                            <span class="text-green-600">✓ Sincronizado</span>
+                        {% else %}
+                            <span class="text-yellow-600">⚠ Pendiente</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // Aquí puedes agregar scripts específicos para el perfil del paciente
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ejemplo de script para manejar interacciones
+            console.log('Perfil del paciente cargado');
+        });
+    </script>
+{% endblock %}

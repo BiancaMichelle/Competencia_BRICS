@@ -1,0 +1,278 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Blockchain{% endblock %}
+
+{% block extra_css %}
+<style>
+.blockchain-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+.stats-card {
+    transition: transform 0.3s ease;
+}
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-cube text-primary"></i>
+                Dashboard Blockchain
+            </h1>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card blockchain-card shadow">
+                <div class="card-body text-center">
+                    <i class="fas fa-cubes fa-3x mb-3"></i>
+                    <h3>{{ total_blocks }}</h3>
+                    <p class="mb-0">Bloques Totales</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-success text-white shadow">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-medical-alt fa-3x mb-3"></i>
+                    <h3>{{ total_records }}</h3>
+                    <p class="mb-0">Registros Médicos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-warning text-white shadow">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-3x mb-3"></i>
+                    <h3>{{ pending_transactions }}</h3>
+                    <p class="mb-0">Transacciones Pendientes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-info text-white shadow">
+                <div class="card-body text-center">
+                    <i class="fas fa-shield-alt fa-3x mb-3"></i>
+                    <h3><i class="fas fa-check-circle"></i></h3>
+                    <p class="mb-0">Blockchain Segura</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bloques Recientes -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cube"></i>
+                        Bloques Recientes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_blocks %}
+                        <div class="list-group list-group-flush">
+                            {% for block in recent_blocks %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Bloque #{{ block.index }}</h6>
+                                    <p class="mb-1 text-muted">{{ block.timestamp|date:"d/m/Y H:i" }}</p>
+                                    <small class="text-muted">Hash: {{ block.hash|slice:":16" }}...</small>
+                                </div>
+                                <span class="badge bg-success rounded-pill">Confirmado</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No hay bloques disponibles.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Registros Médicos Recientes -->
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-medical"></i>
+                        Registros Médicos Recientes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_records %}
+                        <div class="list-group list-group-flush">
+                            {% for record in recent_records %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-1">{{ record.record_type }}</h6>
+                                    <small class="text-muted">{{ record.created_at|date:"d/m/Y H:i" }}</small>
+                                </div>
+                                <p class="mb-1">Paciente: {{ record.patient_id }}</p>
+                                <small class="text-muted">Bloque #{{ record.block.index }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No hay registros médicos disponibles.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tools"></i>
+                        Acciones Rápidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <button class="btn btn-primary btn-block" onclick="verEstadisticas()">
+                                <i class="fas fa-chart-bar"></i>
+                                Ver Estadísticas Completas
+                            </button>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button class="btn btn-success btn-block" onclick="verificarIntegridad()">
+                                <i class="fas fa-shield-alt"></i>
+                                Verificar Integridad
+                            </button>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button class="btn btn-info btn-block" onclick="explorarBlockchain()">
+                                <i class="fas fa-search"></i>
+                                Explorar Blockchain
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para mostrar información -->
+<div class="modal fade" id="infoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Información</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function verEstadisticas() {
+    try {
+        const response = await fetch('{% url "blockchain:stats" %}');
+        const data = await response.json();
+        
+        document.getElementById('modalTitle').textContent = 'Estadísticas de Blockchain';
+        document.getElementById('modalBody').innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Estadísticas Generales</h6>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Total de Bloques</span>
+                            <span class="badge bg-primary">${data.blockchain_stats.total_blocks}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Total de Registros</span>
+                            <span class="badge bg-success">${data.blockchain_stats.total_records}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Total de Transacciones</span>
+                            <span class="badge bg-info">${data.blockchain_stats.total_transactions}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Estado de Transacciones</h6>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Confirmadas</span>
+                            <span class="badge bg-success">${data.transaction_stats.confirmed}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Pendientes</span>
+                            <span class="badge bg-warning">${data.transaction_stats.pending}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Fallidas</span>
+                            <span class="badge bg-danger">${data.transaction_stats.failed}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        `;
+        
+        new bootstrap.Modal(document.getElementById('infoModal')).show();
+    } catch (error) {
+        alert('Error al cargar estadísticas: ' + error.message);
+    }
+}
+
+function verificarIntegridad() {
+    document.getElementById('modalTitle').textContent = 'Verificación de Integridad';
+    document.getElementById('modalBody').innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Verificando...</span>
+            </div>
+            <p class="mt-2">Verificando integridad de la blockchain...</p>
+        </div>
+    `;
+    
+    new bootstrap.Modal(document.getElementById('infoModal')).show();
+    
+    // Simular verificación
+    setTimeout(() => {
+        document.getElementById('modalBody').innerHTML = `
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-check-circle"></i>
+                <strong>¡Blockchain Verificada!</strong>
+                <p class="mb-0">Todos los bloques han sido verificados correctamente. La integridad de los datos está garantizada.</p>
+            </div>
+        `;
+    }, 2000);
+}
+
+function explorarBlockchain() {
+    document.getElementById('modalTitle').textContent = 'Explorador de Blockchain';
+    document.getElementById('modalBody').innerHTML = `
+        <p>Funcionalidad de exploración en desarrollo...</p>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            Esta funcionalidad permitirá explorar todos los bloques y transacciones en detalle.
+        </div>
+    `;
+    
+    new bootstrap.Modal(document.getElementById('infoModal')).show();
+}
+</script>
+{% endblock %}

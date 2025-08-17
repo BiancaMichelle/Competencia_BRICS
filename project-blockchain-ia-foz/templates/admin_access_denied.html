@@ -1,0 +1,41 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Acceso Denegado{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div class="max-w-md w-full bg-white shadow-lg rounded-lg p-6">
+        <div class="text-center">
+            <!-- Icono de error -->
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.98-.833-2.75 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+            </div>
+            
+            <!-- Título -->
+            <h2 class="mt-4 text-lg font-medium text-gray-900">Acceso Denegado</h2>
+            
+            <!-- Mensaje -->
+            <p class="mt-2 text-sm text-gray-600">
+                No tienes permisos para acceder al panel de administración. 
+                Solo los Administradores pueden acceder a esta sección.
+            </p>
+            
+            <!-- Botones de acción -->
+            <div class="mt-6 flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
+                <a href="{% url 'core:index' %}" 
+                   class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 text-center">
+                    Ir al Inicio
+                </a>
+                {% if not user.is_authenticated %}
+                <a href="{% url 'login' %}" 
+                   class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors duration-200 text-center">
+                    Iniciar Sesión
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
