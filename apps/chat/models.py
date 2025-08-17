@@ -8,6 +8,8 @@ class ChatMessage(models.Model):
     user = models.ForeignKey(
         User, 
         on_delete=models.CASCADE, 
+        null=True,  # Permitir NULL temporalmente
+        blank=True,  # Permitir vacío en formularios
         verbose_name="Usuario"
     )
     user_message = models.TextField(verbose_name="Mensaje del usuario", help_text="Mensaje enviado por el usuario")
@@ -30,6 +32,3 @@ class ChatMessage(models.Model):
     def __str__(self):
         username = self.user.username if self.user else "Anónimo"
         return f"{username} - {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
-    
-    def __str__(self):
-        return f"Chat - {self.created_at.strftime('%Y-%m-%d %H:%M')}"

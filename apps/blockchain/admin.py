@@ -1,10 +1,11 @@
 from django.contrib import admin
 from .models import (
-    Block, MedicalRecord, BlockchainTransaction,
-    Paciente, Profesional, Alergia, CondicionMedica, 
+    Block, Paciente, Profesional, Alergia, CondicionMedica, 
     Medicamento, Tratamiento, Antecedente, PruebaLaboratorio, 
-    Cirugia, Turno
+    Cirugia, Turno, BlockchainHash, MedicalRecordVersion
 )
+
+# NOTA: BlockchainTransaction ELIMINADO - No se usaba en el sistema
 
 
 @admin.register(Block)
@@ -23,25 +24,7 @@ class BlockAdmin(admin.ModelAdmin):
     previous_hash_short.short_description = 'Hash Anterior'
 
 
-@admin.register(MedicalRecord)
-class MedicalRecordAdmin(admin.ModelAdmin):
-    list_display = ('paciente', 'tipo_registro', 'hash_short', 'block', 'timestamp')
-    list_filter = ('tipo_registro', 'timestamp', 'verificado')
-    search_fields = ('paciente__user__first_name', 'paciente__user__last_name', 'tipo_registro')
-    readonly_fields = ('hash_registro', 'timestamp')
-    
-    def hash_short(self, obj):
-        return obj.hash_registro[:16] + '...' if len(obj.hash_registro) > 16 else obj.hash_registro
-    hash_short.short_description = 'Hash'
-
-
-@admin.register(BlockchainTransaction)
-class BlockchainTransactionAdmin(admin.ModelAdmin):
-    list_display = ('from_address', 'to_address', 'amount', 'timestamp')
-    list_filter = ('timestamp',)
-    search_fields = ('from_address', 'to_address')
-    readonly_fields = ('timestamp',)
-
+# MedicalRecordAdmin y BlockchainTransactionAdmin ELIMINADOS
 
 # ===========================================
 # ADMINISTRACIÓN DE MODELOS MÉDICOS
@@ -49,23 +32,23 @@ class BlockchainTransactionAdmin(admin.ModelAdmin):
 
 @admin.register(Paciente)
 class PacienteAdmin(admin.ModelAdmin):
-    list_display = ['user', 'cedula', 'fecha_nacimiento', 'tipo_sangre', 'telefono']
-    search_fields = ['user__first_name', 'user__last_name', 'cedula']
-    list_filter = ['tipo_sangre', 'fecha_nacimiento']
-    readonly_fields = ['blockchain_hash', 'ultimo_bloque_actualizado', 'fecha_ultimo_hash']
+    """Admin para el modelo principal de Paciente"""
+    list_display = ['cedula', 'nombres', 'apellidos', 'genero', 'tipo_sangre']
+    search_fields = ['cedula', 'nombres', 'apellidos', 'telefono']
+    list_filter = ['genero', 'tipo_sangre']
     
-    fieldsets = (
-        ('Información Personal', {
-            'fields': ('user', 'cedula', 'fecha_nacimiento', 'telefono', 'direccion')
-        }),
-        ('Información Médica', {
-            'fields': ('tipo_sangre',)
-        }),
-        ('Blockchain', {
-            'fields': ('blockchain_hash', 'ultimo_bloque_actualizado', 'fecha_ultimo_hash'),
-            'classes': ('collapse',)
-        }),
-    )
+    def get_blockchain_status(self, obj):
+        """Muestra el estado del blockchain para el paciente"""
+        try:
+            blockchain_hash = BlockchainHash.objects.get(
+                content_type='Paciente',
+                object_id=obj.pk
+            )
+            return f"Hash: {blockchain_hash.hash_value[:16]}... ✓"
+        except BlockchainHash.DoesNotExist:
+            return "Sin hash blockchain ✗"
+    
+    get_blockchain_status.short_description = "Estado Blockchain"
 
 
 @admin.register(Profesional)
@@ -89,7 +72,6 @@ class AlergiaAdmin(admin.ModelAdmin):
     list_display = ['paciente', 'sustancia', 'severidad', 'fecha_diagnostico']
     search_fields = ['paciente__user__first_name', 'paciente__user__last_name', 'sustancia']
     list_filter = ['severidad', 'fecha_diagnostico']
-    readonly_fields = ['blockchain_hash']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('paciente__user')
@@ -97,10 +79,9 @@ class AlergiaAdmin(admin.ModelAdmin):
 
 @admin.register(CondicionMedica)
 class CondicionMedicaAdmin(admin.ModelAdmin):
-    list_display = ['paciente', 'nombre', 'estado', 'fecha_diagnostico']
-    search_fields = ['paciente__user__first_name', 'paciente__user__last_name', 'nombre']
+    list_display = ['paciente', 'codigo', 'estado', 'fecha_diagnostico']
+    search_fields = ['paciente__user__first_name', 'paciente__user__last_name', 'codigo']
     list_filter = ['estado', 'fecha_diagnostico']
-    readonly_fields = ['blockchain_hash']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('paciente__user')
@@ -118,7 +99,6 @@ class TratamientoAdmin(admin.ModelAdmin):
     list_display = ['paciente', 'profesional', 'medicamento', 'fecha_inicio', 'fecha_fin', 'activo']
     search_fields = ['paciente__user__first_name', 'paciente__user__last_name']
     list_filter = ['activo', 'fecha_inicio', 'profesional__especialidad']
-    readonly_fields = ['blockchain_hash']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('paciente__user', 'profesional__user', 'medicamento')
@@ -129,7 +109,6 @@ class AntecedenteAdmin(admin.ModelAdmin):
     list_display = ['paciente', 'tipo', 'descripcion', 'fecha_evento']
     search_fields = ['paciente__user__first_name', 'paciente__user__last_name']
     list_filter = ['tipo', 'fecha_evento']
-    readonly_fields = ['blockchain_hash']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('paciente__user')
@@ -140,7 +119,6 @@ class PruebaLaboratorioAdmin(admin.ModelAdmin):
     list_display = ['paciente', 'nombre_prueba', 'fecha_realizacion', 'profesional']
     search_fields = ['paciente__user__first_name', 'paciente__user__last_name', 'nombre_prueba']
     list_filter = ['fecha_realizacion', 'profesional__especialidad']
-    readonly_fields = ['blockchain_hash']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('paciente__user', 'profesional__user')
@@ -151,7 +129,6 @@ class CirugiaAdmin(admin.ModelAdmin):
     list_display = ['paciente', 'nombre_cirugia', 'fecha_cirugia', 'profesional', 'estado']
     search_fields = ['paciente__user__first_name', 'paciente__user__last_name', 'nombre_cirugia']
     list_filter = ['estado', 'fecha_cirugia', 'profesional__especialidad']
-    readonly_fields = ['blockchain_hash']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('paciente__user', 'profesional__user')
@@ -179,3 +156,21 @@ class TurnoAdmin(admin.ModelAdmin):
             'fields': ('motivo', 'observaciones')
         }),
     )
+
+
+# ===========================================
+# ADMINISTRACIÓN DE MODELOS FHIR
+# ===========================================
+
+@admin.register(BlockchainHash)
+class BlockchainHashAdmin(admin.ModelAdmin):
+    list_display = ['content_type', 'object_id', 'hash_short', 'timestamp', 'is_verified']
+    list_filter = ['content_type', 'is_verified', 'timestamp']
+    search_fields = ['hash_value', 'content_type']
+    readonly_fields = ['hash_value', 'timestamp']
+    
+    def hash_short(self, obj):
+        return obj.hash_value[:16] + '...' if len(obj.hash_value) > 16 else obj.hash_value
+    hash_short.short_description = 'Hash'
+
+
