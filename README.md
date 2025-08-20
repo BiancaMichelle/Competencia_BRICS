@@ -58,6 +58,11 @@ npm install
 python manage.py makemigrations
 python manage.py migrate
 ```
+#### Si les salta algun error posiblemente tengan python 3.12 o 3.13, y una version de Django < 4.2
+
+```bash
+pip install --upgrade django
+```
 
 ### 6. Crear superusuario
 
