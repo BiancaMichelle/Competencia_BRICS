@@ -27,10 +27,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+
     # Apps del proyecto
     'core',                   # Módulo principal
     'apps.chat',             # Módulo de chat
     'apps.blockchain',       # Módulo de blockchain
+    'apps.users',            # Módulo de usuarios
 ]
 
 MIDDLEWARE = [

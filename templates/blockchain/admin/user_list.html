@@ -1,0 +1,54 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<h1 class="text-6xl font-bold mb-8 mt-8 text-center mx-auto">Gestión de Usuarios</h1>
+<table class="table-auto w-full mt-4">
+    <thead class="bg-gray-100 border-b border-gray-300">
+        <tr>
+            <th class="border px-4 py-2 text-center">Usuario</th>
+            <th class="border px-4 py-2 text-center">Email</th>
+            <th class="border px-4 py-2 text-center">Rol</th>
+            <th class="border px-4 py-2 text-center">Teléfono</th>
+            <th class="border px-4 py-2 text-center">Estado</th>
+            <th class="border px-4 py-2 text-center">Última actividad</th>
+            <th class="border px-4 py-2 text-center">Fecha de registro</th>
+            <th class="border px-4 py-2 text-center">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr class="border-b border-gray-300">
+            <td class="border px-4 py-2 text-center">{{ user.username }}</td>
+            <td class="border px-4 py-2 text-center">{{ user.email }}</td>
+            <td class="border px-4 py-2 text-center">
+                {% if user.is_superuser %}
+                    Administrador
+                {% elif user.is_staff %}
+                    Staff
+                {% else %}
+                    Usuario
+                {% endif %}
+            </td>
+            <td class="border px-4 py-2 text-center">{{ user.userprofile.phone }}</td>
+            <td class="border px-4 py-2 text-center">
+                {% if user.is_active %}
+                    Activo
+                {% else %}
+                    Inactivo
+                {% endif %}
+            </td>
+            <td class="border px-4 py-2 text-center">
+                {{ user.last_login|date:"d/m/Y H:i" }}  <!-- revisar esto mas adelante -->
+            </td>
+            <td class="border px-4 py-2 text-center">
+                {{ user.date_joined|date:"d/m/Y" }} <!-- revisar esto mas adelante -->
+            </td>
+            <td class="border px-4 py-2 text-center">
+                <a href="{% url 'users:user_detail' user.id %}" class="text-blue-600 hover:underline">Ver</a> | 
+                <a href="{% url 'users:user_delete' user.id %}" class="text-red-600 hover:underline">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

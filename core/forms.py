@@ -24,3 +24,4 @@ class ContactoForm(forms.Form):
             'placeholder': 'Escribe tu mensaje aquí...'
         })
     )
+
