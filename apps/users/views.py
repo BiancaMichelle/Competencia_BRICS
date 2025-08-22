@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
-from core.models import UserProfile
+from .models import UserProfile
 from .forms import UserForm, UserProfileForm
 
 # Restricción: solo admin puede acceder

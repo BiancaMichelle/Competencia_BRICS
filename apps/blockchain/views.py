@@ -10,17 +10,21 @@ from datetime import date, datetime, timedelta
 import json
 
 from .models import (
-    Paciente, Profesional, Alergia, CondicionMedica, 
+    Alergia, CondicionMedica, 
     Medicamento, Tratamiento, Antecedente, PruebaLaboratorio, 
     Cirugia, Block, BlockchainHash, BlockchainService
 )
 # BlockchainTransaction ELIMINADO - No se usaba
 # Importamos los formularios
 from .forms import (
-    PacienteForm, PacienteRegistroForm, ProfesionalForm, ProfesionalRegistroForm, AlergiaForm, 
+    AlergiaForm, 
     CondicionMedicaForm, TratamientoForm, AntecedenteForm, 
     PruebaLaboratorioForm, CirugiaForm, BuscarPacienteForm
 )
+from apps.users.forms import (
+    PacienteForm, PacienteRegistroForm, ProfesionalForm, ProfesionalRegistroForm
+)
+from apps.users.models import Paciente, Profesional
 
 # Función auxiliar para verificar superusuario
 def is_superuser(user):

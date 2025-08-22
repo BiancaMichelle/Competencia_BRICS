@@ -4,115 +4,9 @@ from django.utils import timezone
 import hashlib
 import json
 
-
-class Paciente(models.Model):
-    """Modelo principal de Paciente del sistema médico"""
-    GENDER_CHOICES = [
-        ('male', 'Masculino'),
-        ('female', 'Femenino'),
-        ('other', 'Otro'),
-        ('unknown', 'Desconocido'),
-    ]
-    
-    STATUS_CHOICES = [
-        ('active', 'Activo'),
-        ('inactive', 'Inactivo'),
-        ('suspended', 'Suspendido'),
-    ]
-    
-    TIPOS_SANGRE = [
-        ('A+', 'A+'),
-        ('A-', 'A-'),
-        ('B+', 'B+'),
-        ('B-', 'B-'),
-        ('AB+', 'AB+'),
-        ('AB-', 'AB-'),
-        ('O+', 'O+'),
-        ('O-', 'O-'),
-    ]
-    
-    # Relación con usuario de Django
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    
-    # Identificadores únicos
-    cedula = models.CharField(max_length=20, unique=True)
-    
-    # Datos personales
-    nombres = models.CharField(max_length=100)
-    apellidos = models.CharField(max_length=100)
-    genero = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    fecha_nacimiento = models.DateField()
-    tipo_sangre = models.CharField(max_length=3, choices=TIPOS_SANGRE, blank=True)
-    
-    # Contacto
-    telefono = models.CharField(max_length=20, blank=True)
-    email = models.EmailField(blank=True)
-    
-    # Dirección
-    direccion = models.TextField(blank=True)
-    ciudad = models.CharField(max_length=100, blank=True)
-    codigo_postal = models.CharField(max_length=20, blank=True)
-    
-    class Meta:
-        verbose_name = "Paciente"
-        verbose_name_plural = "Pacientes"
-    
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-    
-    def __str__(self):
-        return f"{self.nombres} {self.apellidos}"
-    
-    def get_full_name(self):
-        return f"{self.nombres} {self.apellidos}"
-    
-    def get_edad(self):
-        """Calcula la edad del paciente"""
-        from datetime import date
-        today = date.today()
-        return today.year - self.fecha_nacimiento.year - ((today.month, today.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day))
-    
-    def generate_blockchain_data(self):
-        """Genera datos estructurados para blockchain"""
-    def generate_blockchain_data(self):
-        """Genera datos estructurados para blockchain"""
-        return {
-            'resource_type': 'Patient',
-            'cedula': self.cedula,
-            'name': self.get_full_name(),
-            'gender': self.genero,
-            'birth_date': str(self.fecha_nacimiento),
-            'tipo_sangre': self.tipo_sangre,
-            'phone': self.telefono,
-            'timestamp': str(timezone.now())
-        }
+from apps.users.models import Paciente, Profesional
 
 
-class Profesional(models.Model):
-    ESPECIALIDADES = [
-        ('cardiologia', 'Cardiología'),
-        ('dermatologia', 'Dermatología'),
-        ('endocrinologia', 'Endocrinología'),
-        ('gastroenterologia', 'Gastroenterología'),
-        ('ginecologia', 'Ginecología'),
-        ('neurologia', 'Neurología'),
-        ('nutricion', 'Nutrición'),
-        ('oftalmologia', 'Oftalmología'),
-        ('pediatria', 'Pediatría'),
-        ('psiquiatria', 'Psiquiatría'),
-        ('traumatologia', 'Traumatología'),
-        ('urologia', 'Urología'),
-        ('medicina_general', 'Medicina General'),
-    ]
-    
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    especialidad = models.CharField(max_length=50, choices=ESPECIALIDADES)
-    matricula = models.CharField(max_length=20, unique=True)
-    telefono = models.CharField(max_length=20)
-    consultorio = models.CharField(max_length=100, blank=True)
-    
-    def __str__(self):
-        return f"Dr/a. {self.user.first_name} {self.user.last_name} - {self.get_especialidad_display()}"
 
 
 class Alergia(models.Model):
@@ -134,7 +28,7 @@ class Alergia(models.Model):
 
 
 class CondicionMedica(models.Model):
-    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='condiciones')
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='condiciones')
     codigo = models.CharField(max_length=200)
     descripcion = models.TextField(blank=True)
     fecha_diagnostico = models.DateField()
@@ -160,7 +54,7 @@ class Medicamento(models.Model):
 
 
 class Tratamiento(models.Model):
-    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='tratamientos')
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='tratamientos')
     profesional = models.ForeignKey(Profesional, on_delete=models.CASCADE)
     medicamento = models.ForeignKey(Medicamento, on_delete=models.CASCADE, null=True, blank=True)
     descripcion = models.TextField()
@@ -186,7 +80,7 @@ class Antecedente(models.Model):
         ('farmacologico', 'Farmacológico'),
     ]
     
-    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='antecedentes')
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='antecedentes')
     tipo = models.CharField(max_length=20, choices=TIPOS_ANTECEDENTE)
     descripcion = models.TextField()
     fecha_evento = models.DateField(null=True, blank=True)
@@ -198,7 +92,7 @@ class Antecedente(models.Model):
 
 
 class PruebaLaboratorio(models.Model):
-    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='pruebas')
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='pruebas')
     profesional = models.ForeignKey(Profesional, on_delete=models.CASCADE)
     nombre_prueba = models.CharField(max_length=200)
     fecha_realizacion = models.DateField()
@@ -213,7 +107,7 @@ class PruebaLaboratorio(models.Model):
 
 
 class Cirugia(models.Model):
-    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='cirugias')
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='cirugias')
     profesional = models.ForeignKey(Profesional, on_delete=models.CASCADE)
     nombre_cirugia = models.CharField(max_length=200)
     fecha_cirugia = models.DateField()
@@ -242,7 +136,7 @@ class Turno(models.Model):
         ('no_asistio', 'No Asistió')
     ]
     
-    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='turnos')
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='turnos')
     profesional = models.ForeignKey(Profesional, on_delete=models.CASCADE, related_name='turnos')
     fecha_hora = models.DateTimeField()
     motivo = models.TextField()

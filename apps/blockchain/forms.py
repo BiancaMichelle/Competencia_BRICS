@@ -1,87 +1,9 @@
 from django import forms
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
 from .models import (
-    Paciente, Profesional, Alergia, CondicionMedica, 
+    Alergia, CondicionMedica, 
     Medicamento, Tratamiento, Antecedente, PruebaLaboratorio, 
     Cirugia, Turno
 )
-
-
-class PacienteForm(forms.ModelForm):
-    class Meta:
-        model = Paciente
-        fields = ['cedula', 'fecha_nacimiento', 'telefono', 'direccion', 'tipo_sangre']
-        widgets = {
-            'fecha_nacimiento': forms.DateInput(attrs={'type': 'date', 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'}),
-            'cedula': forms.TextInput(attrs={'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500', 'placeholder': 'Ej: 1234567-8'}),
-            'telefono': forms.TextInput(attrs={'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500', 'placeholder': 'Ej: +595 21 123456'}),
-            'direccion': forms.Textarea(attrs={'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500', 'rows': 3}),
-            'tipo_sangre': forms.Select(attrs={'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'}),
-        }
-        labels = {
-            'cedula': 'Cédula de Identidad',
-            'fecha_nacimiento': 'Fecha de Nacimiento',
-            'telefono': 'Teléfono',
-            'direccion': 'Dirección',
-            'tipo_sangre': 'Tipo de Sangre',
-        }
-
-
-class PacienteRegistroForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30, required=True, label='Nombre')
-    last_name = forms.CharField(max_length=30, required=True, label='Apellido')
-    email = forms.EmailField(required=True, label='Correo Electrónico')
-    
-    class Meta:
-        model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
-        labels = {
-            'username': 'Nombre de Usuario',
-        }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        tailwind_classes = 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
-        for field in self.fields.values():
-            field.widget.attrs['class'] = tailwind_classes
-
-
-class ProfesionalForm(forms.ModelForm):
-    class Meta:
-        model = Profesional
-        fields = ['especialidad', 'matricula', 'telefono', 'consultorio']
-        widgets = {
-            'especialidad': forms.Select(attrs={'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'}),
-            'matricula': forms.TextInput(attrs={'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500', 'placeholder': 'Ej: MP-12345'}),
-            'telefono': forms.TextInput(attrs={'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500', 'placeholder': 'Ej: +595 21 123456'}),
-            'consultorio': forms.TextInput(attrs={'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500', 'placeholder': 'Ej: Consultorio 201'}),
-        }
-        labels = {
-            'especialidad': 'Especialidad',
-            'matricula': 'Número de Matrícula',
-            'telefono': 'Teléfono',
-            'consultorio': 'Consultorio',
-        }
-
-
-class ProfesionalRegistroForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30, required=True, label='Nombre')
-    last_name = forms.CharField(max_length=30, required=True, label='Apellido')
-    email = forms.EmailField(required=True, label='Correo Electrónico')
-    
-    class Meta:
-        model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
-        labels = {
-            'username': 'Nombre de Usuario',
-        }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        tailwind_classes = 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
-        for field in self.fields.values():
-            field.widget.attrs['class'] = tailwind_classes
 
 
 class AlergiaForm(forms.ModelForm):
