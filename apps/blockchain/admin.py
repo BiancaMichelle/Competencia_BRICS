@@ -75,6 +75,21 @@ class AlergiaAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('paciente__user')
+    
+    def paciente_nombre(self, obj):
+        try:
+            return obj.paciente.get_full_name()
+        except Exception:
+            return str(obj.paciente) if obj.paciente else ''
+    paciente_nombre.admin_order_field = 'paciente__nombres'
+    paciente_nombre.short_description = 'Paciente'
+
+    def paciente_email(self, obj):
+        try:
+            return obj.paciente.user.email
+        except Exception:
+            return obj.paciente.email if obj.paciente else ''
+    paciente_email.short_description = 'Email paciente'
 
 
 @admin.register(CondicionMedica)
@@ -113,6 +128,13 @@ class AntecedenteAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('paciente__user')
 
+    
+    def user_email(self, obj):
+        try:
+            return obj.user.email
+        except Exception:
+            return obj.email
+    user_email.short_description = 'Email'
 
 @admin.register(PruebaLaboratorio)
 class PruebaLaboratorioAdmin(admin.ModelAdmin):

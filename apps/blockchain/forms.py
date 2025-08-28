@@ -182,21 +182,6 @@ class TurnoPacienteForm(forms.ModelForm):
             'motivo': 'Motivo de la Consulta',
         }
 
-
-# Formulario para búsqueda de pacientes
-class BuscarPacienteForm(forms.Form):
-    cedula = forms.CharField(
-        max_length=20, 
-        required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Buscar por cédula'})
-    )
-    nombre = forms.CharField(
-        max_length=100, 
-        required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Buscar por nombre'})
-    )
-
-
 # Formularios específicos para Blockchain
 class BlockchainRecordForm(forms.Form):
     """Formulario para agregar registros a la blockchain"""

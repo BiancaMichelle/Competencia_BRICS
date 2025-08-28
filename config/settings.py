@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     # Apps del proyecto
     'core',                   # Módulo principal
     'apps.chat',             # Módulo de chat
-    'apps.blockchain',       # Módulo de blockchain
+    'apps.blockchain.apps.BlockchainConfig',       # Módulo de blockchain
     'apps.users',            # Módulo de usuarios
 ]
 

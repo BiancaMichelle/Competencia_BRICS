@@ -6,6 +6,10 @@ import json
 
 from apps.users.models import Paciente, Profesional
 
+# SIGNALS PARA AUTOMATIZAR CREACIÓN DE HASHES
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 
 
@@ -199,7 +203,6 @@ class BlockchainHash(models.Model):
     block_reference = models.ForeignKey(Block, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
-        unique_together = ('content_type', 'object_id')
         ordering = ['-timestamp']
     
     def __str__(self):
@@ -228,21 +231,66 @@ class BlockchainService:
         if hash_value:
             # Obtener el hash anterior para crear cadena
             content_type = model_instance.__class__.__name__
+            # previous_hash global por tipo (mantener por compatibilidad)
             previous_hash_obj = BlockchainHash.objects.filter(
                 content_type=content_type
             ).order_by('-timestamp').first()
-            
+
             previous_hash = previous_hash_obj.hash_value if previous_hash_obj else "0"
-            
-            blockchain_hash = BlockchainHash.objects.create(
+
+            # Usar update_or_create para evitar errores por unique_together mientras migramos a versionado
+            blockchain_hash, created = BlockchainHash.objects.update_or_create(
                 content_type=content_type,
                 object_id=model_instance.pk,
-                hash_value=hash_value,
-                previous_hash=previous_hash
+                defaults={
+                    'hash_value': hash_value,
+                    'previous_hash': previous_hash,
+                    'timestamp': timezone.now(),
+                }
             )
-            
+
             return blockchain_hash
         return None
+
+    @staticmethod
+    def create_patient_version(paciente, created_by=None):
+        """Crea una nueva versión/hash específica para un paciente.
+        Esto permite versionado por paciente cuando cambian sus registros médicos.
+        """
+        # Generar snapshot (usar generate_blockchain_data como base)
+        if not hasattr(paciente, 'generate_blockchain_data'):
+            return None
+
+        snapshot = paciente.generate_blockchain_data()
+        hash_input = json.dumps(snapshot, sort_keys=True)
+        hash_value = hashlib.sha256(hash_input.encode()).hexdigest()
+
+        content_type = 'Patient'
+        # previous hash por paciente (cadena por objeto)
+        previous_hash_obj = BlockchainHash.objects.filter(
+            content_type=content_type,
+            object_id=paciente.pk
+        ).order_by('-timestamp').first()
+
+        previous_hash = previous_hash_obj.hash_value if previous_hash_obj else "0"
+
+        blockchain_hash = BlockchainHash.objects.create(
+            content_type=content_type,
+            object_id=paciente.pk,
+            hash_value=hash_value,
+            previous_hash=previous_hash
+        )
+
+        # Crear registro de versión (sin cifrar aquí, podemos añadir cifrado después)
+        MedicalRecordVersion.objects.create(
+            content_type=content_type,
+            object_id=paciente.pk,
+            version_data=json.dumps(snapshot, sort_keys=True),
+            hash_blockchain=blockchain_hash,
+            created_by=created_by
+        )
+
+        return blockchain_hash
     
     @staticmethod
     def verify_chain_integrity(content_type=None):
@@ -265,9 +313,6 @@ class BlockchainService:
         return True, "Cadena íntegra"
 
 
-# SIGNALS PARA AUTOMATIZAR CREACIÓN DE HASHES
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 @receiver(post_save, sender=Paciente)
 def create_patient_hash(sender, instance, created, **kwargs):
@@ -292,25 +337,3 @@ class MedicalRecordVersion(models.Model):
     def __str__(self):
         return f"Version {self.content_type}:{self.object_id} - {self.created_at}"
 
-
-# COMPATIBILIDAD CON MODELOS LEGACY - YA NO NECESARIO
-# El modelo Paciente ha sido eliminado, ahora Paciente es el modelo principal
-
-class DataMigrationUtils:
-    """Utilidades para migración de datos"""
-    
-    @staticmethod
-    def create_patient_from_user(user, cedula, fecha_nacimiento, telefono='', direccion='', tipo_sangre=''):
-        """Crea un paciente desde datos básicos"""
-        return Paciente.objects.create(
-            user=user,
-            cedula=cedula,
-            nombres=user.first_name,
-            apellidos=user.last_name,
-            genero='unknown',
-            fecha_nacimiento=fecha_nacimiento,
-            telefono=telefono,
-            direccion=direccion,
-            tipo_sangre=tipo_sangre,
-            email=user.email or ''
-        )

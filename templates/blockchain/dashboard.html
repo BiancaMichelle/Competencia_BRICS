@@ -3,10 +3,44 @@
 {% block title %}Dashboard Blockchain Médico{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50" x-data="{ sidebarOpen: false }">
-    
+<div class="min-h-screen bg-gray-50 lg:flex" x-data="{ sidebarOpen: false }">
+    <!-- Sidebar -->
+    <aside class="w-full lg:w-64 bg-white border-r border-gray-200 flex-shrink-0"
+           x-bind:class="sidebarOpen ? 'block' : 'block'">
+        <div class="h-full flex flex-col p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-semibold">Panel de control de profesionales</h2>
+                <button class="lg:hidden text-gray-500" @click="sidebarOpen = false">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <nav class="space-y-3 flex-1">
+                {% if user.is_superuser %}
+                <a href="{% url 'users:admin_registro_profesional' %}" class="flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                    Registrar Médico
+                </a>
+                {% endif %}
+
+                <a href="{% url 'users:user_list' %}" class="flex items-center px-4 py-2 rounded-lg bg-gray-100 text-gray-800 text-sm font-medium hover:bg-gray-200 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.91 0 5.584.9 7.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0zM19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2" />
+                    </svg>
+                    Pacientes
+                </a>
+            </nav>
+
+            <div class="mt-6 text-xs text-gray-500">Panel de control de profesionales</div>
+        </div>
+    </aside>
+
     <!-- Main Content -->
-    <div class="lg:ml-64">
+    <div class="flex-1">
         
         <!-- Dashboard Content -->
         <main class="p-6">
@@ -16,17 +50,7 @@
                     <h1 class="text-3xl font-bold text-gray-900">Dashboard Médico Blockchain</h1>
                     <p class="text-gray-600 mt-1">Panel de control del sistema médico con tecnología blockchain</p>
                 </div>
-                {% if user.is_superuser %}
-                <div>
-                    <a href="{% url 'blockchain:admin_registro_profesional' %}" 
-                       class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                        </svg>
-                        Registrar Médico
-                    </a>
-                </div>
-                {% endif %}
+                <!-- Header actions moved to sidebar for consistent layout on large screens -->
             </div>
             
             <!-- Metrics Cards -->

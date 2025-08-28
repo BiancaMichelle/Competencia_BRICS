@@ -1,4 +1,4 @@
-{% extends 'forms/base_form.html' %}
+{% extends 'blockchain/forms/base_form.html' %}
 
 {% block title %}Agregar Alergia{% endblock %}
 
@@ -6,4 +6,4 @@
 
 {% block submit_text %}Agregar Alergia{% endblock %}
 
-{% block cancel_url %}{% url 'blockchain:perfil_paciente' paciente.id %}{% endblock %}
+{% block cancel_url %}{% url 'users:perfil_paciente' paciente.id %}{% endblock %}

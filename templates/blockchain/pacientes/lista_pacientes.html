@@ -1,42 +1,55 @@
-<!-- Vista de Pacientes -->
-<div id="pacientes-view" class="bg-white p-8 rounded-2xl shadow-lg hidden">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Buscar Pacientes</h1>
-        <button onclick="showView('inicio-view')" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
-            ← Volver al Inicio
-        </button>
-    </div>
-    <div class="mb-6">
-        <a href="{% url 'blockchain:buscar_pacientes' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300">
-            Ir a Búsqueda Avanzada
-        </a>
-    </div>
-    
-    {% if pacientes_recientes %}
-    <div>
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Pacientes Recientes</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {% for paciente in pacientes_recientes %}
-                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">
-                        {{ paciente.user.first_name }} {{ paciente.user.last_name }}
-                    </h3>
-                    <p class="text-gray-600 text-sm">C.I.: {{ paciente.cedula }}</p>
-                    <p class="text-gray-600 text-sm">Edad: {{ paciente.get_edad }} años</p>
-                    <p class="text-gray-600 text-sm">Tel: {{ paciente.telefono }}</p>
-                    
-                    <a href="{% url 'blockchain:perfil_paciente' paciente.id %}" 
-                       class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300 mt-4">
-                        Ver Perfil
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% else %}
-    <div class="text-center py-8">
-        <p class="text-gray-500 text-lg">No hay pacientes recientes</p>
-        <p class="text-gray-400">Los pacientes aparecerán aquí después de sus primeras consultas</p>
-    </div>
-    {% endif %}
-</div>
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %}Lista de Pacientes{% endblock %}
+{% block content %}
+<h1 class="text-6xl font-bold mb-8 mt-8 text-center mx-auto">Gestión de Pacientes</h1>
+<table class="table-auto w-full mt-4">
+    <thead class="bg-gray-100 border-b border-gray-300">
+        <tr>
+            <th class="border px-4 py-2 text-center">Usuario</th>
+            <th class="border px-4 py-2 text-center">Email</th>
+            <th class="border px-4 py-2 text-center">Rol</th>
+            <th class="border px-4 py-2 text-center">Teléfono</th>
+            <th class="border px-4 py-2 text-center">Estado</th>
+            <th class="border px-4 py-2 text-center">Última actividad</th>
+            <th class="border px-4 py-2 text-center">Fecha de registro</th>
+            <th class="border px-4 py-2 text-center">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for paciente in pacientes %}
+        <tr class="border-b border-gray-300">
+            <td class="border px-4 py-2 text-center">{{ paciente.user.username }}</td>
+            <td class="border px-4 py-2 text-center">{{ paciente.user.email }}</td>
+            <td class="border px-4 py-2 text-center">
+                {% if paciente.user.is_superuser %}
+                    Administrador
+                {% elif paciente.user.is_staff %}
+                    Staff
+                {% else %}
+                    Paciente
+                {% endif %}
+            </td>
+            <td class="border px-4 py-2 text-center">{{ paciente.telefono }}</td>
+            <td class="border px-4 py-2 text-center">
+                {% if paciente.user.is_active %}
+                    Activo
+                {% else %}
+                    Inactivo
+                {% endif %}
+            </td>
+            <td class="border px-4 py-2 text-center">
+                {{ paciente.user.last_login|date:"d/m/Y H:i" }}
+            </td>
+            <td class="border px-4 py-2 text-center">
+                {{ paciente.user.date_joined|date:"d/m/Y" }}
+            </td>
+            <td class="border px-4 py-2 text-center">
+                <a href="{% url 'users:perfil_paciente' paciente.id %}" class="text-blue-600 hover:underline">Ver</a> |
+                <a href="{% url 'users:user_delete' paciente.user.id %}" class="text-red-600 hover:underline">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

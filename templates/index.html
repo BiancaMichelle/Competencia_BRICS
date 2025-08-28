@@ -16,12 +16,10 @@
                 <div class="space-y-4">
                     <p class="text-lg">¡Hola, <span class="font-semibold text-primary">{{ user.username }}</span>!</p>
                     <div class="flex gap-4 justify-center">
-                        {% if user.paciente %}
-                            <a href="{% url 'blockchain:panel_paciente' %}" class="btn btn-primary">Panel de Paciente</a>
-                        {% elif user.profesional %}
-                            <a href="{% url 'blockchain:panel_profesional' %}" class="btn btn-secondary">Panel Profesional</a>
+                        {% if user.profesional %}
+                            <a href="{% url 'users:panel_profesional' %}" class="btn btn-secondary">Panel Profesional</a>
                         {% else %}
-                            <a href="{% url 'blockchain:panel_paciente' %}" class="btn btn-accent">Ver Perfil</a>
+                            <a href="{% url 'users:mi_perfil' %}" class="btn btn-accent">Ver Perfil</a>
                         {% endif %}
                         <a href="{% url 'logout' %}" class="btn btn-outline">Cerrar Sesión</a>
                     </div>
@@ -31,10 +29,10 @@
                     <a class="btn btn-primary" href="{% url 'login' %}">Iniciar Sesión</a>
                     <div class="divider">O regístrate como:</div>
                     <div class="flex gap-4 justify-center">
-                        <a href="{% url 'blockchain:registro_paciente' %}" class="btn btn-outline btn-primary">
+                        <a href="{% url 'users:registro_paciente' %}" class="btn btn-outline btn-primary">
                             Paciente
                         </a>
-                        <a href="{% url 'blockchain:registro_profesional' %}" class="btn btn-outline btn-secondary">
+                        <a href="{% url 'users:registro_profesional' %}" class="btn btn-outline btn-secondary">
                             Profesional
                         </a>
                     </div>

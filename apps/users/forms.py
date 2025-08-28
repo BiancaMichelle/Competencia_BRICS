@@ -1,19 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Paciente, Profesional, UserProfile
+from .models import Paciente, Profesional
 
-class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput, required=False)
-
-    class Meta:
-        model = User
-        fields = ["username", "email", "first_name", "last_name", "is_active", "is_staff"]
-
-class UserProfileForm(forms.ModelForm):
-    class Meta:
-        model = UserProfile
-        fields = ["avatar", "bio", "phone", "address"]
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, required=False)
@@ -28,15 +17,6 @@ class UserForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'border rounded px-3 py-2 w-full'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'h-4 w-4'}),
             'is_staff': forms.CheckboxInput(attrs={'class': 'h-4 w-4'}),
-        }
-
-class UserProfileForm(forms.ModelForm):
-    class Meta:
-        model = UserProfile
-        fields = ["phone", "address"]
-        widgets = {
-            'phone': forms.TextInput(attrs={'class': 'border rounded px-3 py-2 w-full'}),
-            'address': forms.TextInput(attrs={'class': 'border rounded px-3 py-2 w-full'}),
         }
 
 
@@ -114,3 +94,16 @@ class ProfesionalRegistroForm(UserCreationForm):
         tailwind_classes = 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
         for field in self.fields.values():
             field.widget.attrs['class'] = tailwind_classes
+
+# Formulario para búsqueda de pacientes
+class BuscarPacienteForm(forms.Form):
+    cedula = forms.CharField(
+        max_length=20, 
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Buscar por cédula'})
+    )
+    nombre = forms.CharField(
+        max_length=100, 
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Buscar por nombre'})
+    )
