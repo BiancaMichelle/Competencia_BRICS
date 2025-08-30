@@ -1,0 +1,54 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %}Lista de Pacientes{% endblock %}
+{% block content %}
+<h1 class="text-6xl font-bold mb-8 mt-8 text-center mx-auto">Gestión de Pacientes</h1>
+<table class="table-auto w-full mt-4">
+    <thead class="bg-gray-100 border-b border-gray-300">
+        <tr>
+            <th class="border px-4 py-2 text-center">Usuario</th>
+            <th class="border px-4 py-2 text-center">Email</th>
+            <th class="border px-4 py-2 text-center">Rol</th>
+            <th class="border px-4 py-2 text-center">Teléfono</th>
+            <th class="border px-4 py-2 text-center">Estado</th>
+            <th class="border px-4 py-2 text-center">Última actividad</th>
+            <th class="border px-4 py-2 text-center">Fecha de registro</th>
+            <th class="border px-4 py-2 text-center">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for paciente in pacientes %}
+        <tr class="border-b border-gray-300">
+            <td class="border px-4 py-2 text-center">{{ paciente.user.username }}</td>
+            <td class="border px-4 py-2 text-center">{{ paciente.user.email }}</td>
+            <td class="border px-4 py-2 text-center">
+                {% if paciente.user.is_superuser %}
+                    Administrador
+                {% elif paciente.user.is_staff %}
+                    Staff
+                {% else %}
+                    Paciente
+                {% endif %}
+            </td>
+            <td class="border px-4 py-2 text-center">{{ paciente.telefono }}</td>
+            <td class="border px-4 py-2 text-center">
+                {% if paciente.user.is_active %}
+                    Activo
+                {% else %}
+                    Inactivo
+                {% endif %}
+            </td>
+            <td class="border px-4 py-2 text-center">
+                {{ paciente.user.last_login|date:"d/m/Y H:i" }}
+            </td>
+            <td class="border px-4 py-2 text-center">
+                {{ paciente.user.date_joined|date:"d/m/Y" }}
+            </td>
+            <td class="border px-4 py-2 text-center">
+                <a href="{% url 'users:perfil_paciente' paciente.id %}" class="text-blue-600 hover:underline">Ver</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

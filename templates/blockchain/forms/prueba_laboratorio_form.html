@@ -1,0 +1,9 @@
+{% extends 'blockchain/forms/base_form.html' %}
+
+{% block title %}Agregar Prueba de Laboratorio{% endblock %}
+
+{% block form_title %}Agregar Nueva Prueba de Laboratorio{% endblock %}
+
+{% block submit_text %}Agregar Prueba{% endblock %}
+
+{% block cancel_url %}{% url 'users:perfil_paciente' paciente.id %}{% endblock %}

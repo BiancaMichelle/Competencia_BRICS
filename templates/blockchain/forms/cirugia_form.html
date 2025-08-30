@@ -1,0 +1,9 @@
+{% extends 'blockchain/forms/base_form.html' %}
+
+{% block title %}Agregar Cirugía{% endblock %}
+
+{% block form_title %}Agregar Nueva Cirugía{% endblock %}
+
+{% block submit_text %}Agregar Cirugía{% endblock %}
+
+{% block cancel_url %}{% url 'users:perfil_paciente' paciente.id %}{% endblock %}

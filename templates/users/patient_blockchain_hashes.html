@@ -1,0 +1,218 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %}Hashes Blockchain - {{ paciente.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto p-6">
+    <!-- Header -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Hashes de Blockchain</h1>
+                <p class="text-gray-600 mt-1">Paciente: {{ paciente.get_full_name }} (C.I.: {{ paciente.cedula }})</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{% url 'users:perfil_paciente' paciente.id %}"
+                   class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm">
+                    Ver Perfil Completo
+                </a>
+                <a href="{% url 'users:buscar_pacientes' %}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                    ← Buscar Pacientes
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if blockchain_hashes %}
+    <!-- Categorías de Hashes -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Hash Génesis -->
+        {% if blockchain_hashes.genesis %}
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-bold text-purple-800 mb-4 flex items-center">
+                <span class="w-3 h-3 bg-purple-500 rounded-full mr-2"></span>
+                Hash Génesis
+            </h2>
+            <div class="space-y-3">
+                {% for hash_info in blockchain_hashes.genesis %}
+                <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-medium text-purple-700">ID: {{ hash_info.record_id }}</span>
+                        <span class="text-xs text-gray-500">{{ hash_info.timestamp|date:"d/m/Y" }}</span>
+                    </div>
+                    <p class="font-mono text-xs text-purple-600 break-all mb-2">{{ hash_info.hash }}</p>
+                    <a href="{% url 'users:hash_detail' hash_info.id %}"
+                       class="inline-block bg-purple-600 hover:bg-purple-700 text-white text-xs px-3 py-1 rounded">
+                        Ver Detalles
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Alergias -->
+        {% if blockchain_hashes.alergia %}
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-bold text-red-800 mb-4 flex items-center">
+                <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+                Alergias
+            </h2>
+            <div class="space-y-3 max-h-96 overflow-y-auto">
+                {% for hash_info in blockchain_hashes.alergia %}
+                <div class="p-3 bg-red-50 rounded-lg border border-red-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-medium text-red-700">Registro #{{ hash_info.record_id }}</span>
+                        <span class="text-xs text-gray-500">{{ hash_info.timestamp|date:"d/m/Y" }}</span>
+                    </div>
+                    <p class="font-mono text-xs text-red-600 break-all mb-2">{{ hash_info.hash }}</p>
+                    <a href="{% url 'users:hash_detail' hash_info.id %}"
+                       class="inline-block bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded">
+                        Ver Detalles
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Condiciones Médicas -->
+        {% if blockchain_hashes.condicion %}
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-bold text-yellow-800 mb-4 flex items-center">
+                <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
+                Condiciones Médicas
+            </h2>
+            <div class="space-y-3 max-h-96 overflow-y-auto">
+                {% for hash_info in blockchain_hashes.condicion %}
+                <div class="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-medium text-yellow-700">Registro #{{ hash_info.record_id }}</span>
+                        <span class="text-xs text-gray-500">{{ hash_info.timestamp|date:"d/m/Y" }}</span>
+                    </div>
+                    <p class="font-mono text-xs text-yellow-600 break-all mb-2">{{ hash_info.hash }}</p>
+                    <a href="{% url 'users:hash_detail' hash_info.id %}"
+                       class="inline-block bg-yellow-600 hover:bg-yellow-700 text-white text-xs px-3 py-1 rounded">
+                        Ver Detalles
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Tratamientos -->
+        {% if blockchain_hashes.tratamiento %}
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-bold text-green-800 mb-4 flex items-center">
+                <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                Tratamientos
+            </h2>
+            <div class="space-y-3 max-h-96 overflow-y-auto">
+                {% for hash_info in blockchain_hashes.tratamiento %}
+                <div class="p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-medium text-green-700">Registro #{{ hash_info.record_id }}</span>
+                        <span class="text-xs text-gray-500">{{ hash_info.timestamp|date:"d/m/Y" }}</span>
+                    </div>
+                    <p class="font-mono text-xs text-green-600 break-all mb-2">{{ hash_info.hash }}</p>
+                    <a href="{% url 'users:hash_detail' hash_info.id %}"
+                       class="inline-block bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 rounded">
+                        Ver Detalles
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Pruebas de Laboratorio -->
+        {% if blockchain_hashes.prueba_laboratorio %}
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-bold text-blue-800 mb-4 flex items-center">
+                <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                Pruebas de Laboratorio
+            </h2>
+            <div class="space-y-3 max-h-96 overflow-y-auto">
+                {% for hash_info in blockchain_hashes.prueba_laboratorio %}
+                <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-medium text-blue-700">Registro #{{ hash_info.record_id }}</span>
+                        <span class="text-xs text-gray-500">{{ hash_info.timestamp|date:"d/m/Y" }}</span>
+                    </div>
+                    <p class="font-mono text-xs text-blue-600 break-all mb-2">{{ hash_info.hash }}</p>
+                    <a href="{% url 'users:hash_detail' hash_info.id %}"
+                       class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded">
+                        Ver Detalles
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Antecedentes -->
+        {% if blockchain_hashes.antecedente %}
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-bold text-indigo-800 mb-4 flex items-center">
+                <span class="w-3 h-3 bg-indigo-500 rounded-full mr-2"></span>
+                Antecedentes
+            </h2>
+            <div class="space-y-3 max-h-96 overflow-y-auto">
+                {% for hash_info in blockchain_hashes.antecedente %}
+                <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-medium text-indigo-700">Registro #{{ hash_info.record_id }}</span>
+                        <span class="text-xs text-gray-500">{{ hash_info.timestamp|date:"d/m/Y" }}</span>
+                    </div>
+                    <p class="font-mono text-xs text-indigo-600 break-all mb-2">{{ hash_info.hash }}</p>
+                    <a href="{% url 'users:hash_detail' hash_info.id %}"
+                       class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 rounded">
+                        Ver Detalles
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Cirugías -->
+        {% if blockchain_hashes.cirugia %}
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-bold text-pink-800 mb-4 flex items-center">
+                <span class="w-3 h-3 bg-pink-500 rounded-full mr-2"></span>
+                Cirugías
+            </h2>
+            <div class="space-y-3 max-h-96 overflow-y-auto">
+                {% for hash_info in blockchain_hashes.cirugia %}
+                <div class="p-3 bg-pink-50 rounded-lg border border-pink-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-medium text-pink-700">Registro #{{ hash_info.record_id }}</span>
+                        <span class="text-xs text-gray-500">{{ hash_info.timestamp|date:"d/m/Y" }}</span>
+                    </div>
+                    <p class="font-mono text-xs text-pink-600 break-all mb-2">{{ hash_info.hash }}</p>
+                    <a href="{% url 'users:hash_detail' hash_info.id %}"
+                       class="inline-block bg-pink-600 hover:bg-pink-700 text-white text-xs px-3 py-1 rounded">
+                        Ver Detalles
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <!-- No hay hashes -->
+    <div class="bg-white p-12 rounded-2xl shadow-lg text-center">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No hay hashes registrados</h3>
+        <p class="text-gray-500">Este paciente aún no tiene registros médicos almacenados en blockchain.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

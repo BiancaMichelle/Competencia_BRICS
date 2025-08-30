@@ -1,0 +1,110 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %}Estado de Blockchain{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-8">
+    <h1 class="text-4xl font-bold mb-8 text-center">Estado de Integración Blockchain</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Polygon Status -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 class="text-2xl font-bold text-purple-800 mb-4 flex items-center">
+                <span class="w-4 h-4 bg-purple-500 rounded-full mr-3 {% if polygon_connected %}animate-pulse{% endif %}"></span>
+                Polygon Network
+            </h2>
+
+            {% if polygon_connected %}
+                <div class="space-y-2">
+                    <p class="text-green-600 font-semibold">✅ Conectado</p>
+                    {% if polygon_info %}
+                        <p><span class="font-semibold">Chain ID:</span> {{ polygon_info.chain_id }}</p>
+                        <p><span class="font-semibold">Último bloque:</span> {{ polygon_info.block_number }}</p>
+                        <p><span class="font-semibold">Precio del gas:</span> {{ polygon_info.gas_price }}</p>
+                    {% endif %}
+                </div>
+            {% else %}
+                <p class="text-red-600 font-semibold">❌ No conectado</p>
+                <p class="text-sm text-gray-600 mt-2">
+                    Verifica tu configuración de POLYGON_RPC_URL en el archivo .env
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Filecoin Status -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center">
+                <span class="w-4 h-4 bg-blue-500 rounded-full mr-3 {% if filecoin_configured %}animate-pulse{% endif %}"></span>
+                Filecoin Storage
+            </h2>
+
+            {% if filecoin_configured %}
+                <div class="space-y-2">
+                    <p class="text-green-600 font-semibold">✅ Configurado</p>
+                    <p class="text-sm text-gray-600">
+                        API configurada para almacenamiento de archivos médicos
+                    </p>
+                </div>
+            {% else %}
+                <p class="text-yellow-600 font-semibold">⚠️ No configurado</p>
+                <p class="text-sm text-gray-600 mt-2">
+                    Configura FILECOIN_API_KEY en el archivo .env para almacenamiento de archivos.<br>
+                    <strong>Nota:</strong> El sistema funciona correctamente sin Filecoin.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Integration Info -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg mt-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Información de Integración</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="font-semibold text-lg mb-2">Polygon (Obligatorio)</h3>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Almacenamiento de hashes de registros médicos</li>
+                    <li>• Verificación de integridad de datos</li>
+                    <li>• Transacciones rápidas y de bajo costo</li>
+                    <li>• <strong>Estado:</strong> {% if polygon_connected %}✅ Funcionando{% else %}❌ Error de conexión{% endif %}</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg mb-2">Filecoin (Opcional)</h3>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Almacenamiento de archivos médicos</li>
+                    <li>• Distribución resistente a la censura</li>
+                    <li>• Recuperación de datos garantizada</li>
+                    <li>• <strong>Estado:</strong> {% if filecoin_configured %}✅ Configurado{% else %}⚠️ No configurado (opcional){% endif %}</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+            <h4 class="font-semibold text-blue-800 mb-2">💡 Estado del Sistema</h4>
+            <p class="text-sm text-blue-700">
+                {% if polygon_connected %}
+                    ✅ <strong>Sistema funcional:</strong> Polygon está conectado. El sistema puede almacenar y verificar hashes de registros médicos.
+                    {% if not filecoin_configured %}
+                        Filecoin no está configurado, pero esto no afecta la funcionalidad principal.
+                    {% endif %}
+                {% else %}
+                    ❌ <strong>Problema detectado:</strong> No se puede conectar a Polygon. Verifica tu configuración de POLYGON_RPC_URL.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Test Actions -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg mt-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Acciones de Prueba</h2>
+        <div class="flex space-x-4">
+            <button class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg">
+                Probar Conexión Polygon
+            </button>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                Probar Almacenamiento Filecoin
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
