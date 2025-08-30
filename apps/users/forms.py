@@ -32,24 +32,24 @@ class PacienteForm(forms.ModelForm):
             'tipo_sangre': forms.Select(attrs={'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'}),
         }
         labels = {
-            'cedula': 'Cédula de Identidad',
-            'fecha_nacimiento': 'Fecha de Nacimiento',
-            'telefono': 'Teléfono',
-            'direccion': 'Dirección',
-            'tipo_sangre': 'Tipo de Sangre',
+            'cedula': 'Identity card',
+            'fecha_nacimiento': 'Date of Birth',
+            'telefono': 'Phone',
+            'direccion': 'Address',
+            'tipo_sangre': 'Blood Type',
         }
 
 
 class PacienteRegistroForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30, required=True, label='Nombre')
-    last_name = forms.CharField(max_length=30, required=True, label='Apellido')
-    email = forms.EmailField(required=True, label='Correo Electrónico')
-    
+    first_name = forms.CharField(max_length=30, required=True, label='First Name')
+    last_name = forms.CharField(max_length=30, required=True, label='Last Name')
+    email = forms.EmailField(required=True, label='Email Address')
+
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
         labels = {
-            'username': 'Nombre de Usuario',
+            'username': 'Username',
         }
     
     def __init__(self, *args, **kwargs):
@@ -70,23 +70,23 @@ class ProfesionalForm(forms.ModelForm):
             'consultorio': forms.TextInput(attrs={'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500', 'placeholder': 'Ej: Consultorio 201'}),
         }
         labels = {
-            'especialidad': 'Especialidad',
-            'matricula': 'Número de Matrícula',
-            'telefono': 'Teléfono',
-            'consultorio': 'Consultorio',
+            'especialidad': 'Specialty',
+            'matricula': 'Registration Number',
+            'telefono': 'Phone',
+            'consultorio': 'Office',
         }
 
 
 class ProfesionalRegistroForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30, required=True, label='Nombre')
-    last_name = forms.CharField(max_length=30, required=True, label='Apellido')
-    email = forms.EmailField(required=True, label='Correo Electrónico')
-    
+    first_name = forms.CharField(max_length=30, required=True, label='First Name')
+    last_name = forms.CharField(max_length=30, required=True, label='Last Name')
+    email = forms.EmailField(required=True, label='Email Address')
+
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
         labels = {
-            'username': 'Nombre de Usuario',
+            'username': 'Username',
         }
     
     def __init__(self, *args, **kwargs):
@@ -117,12 +117,12 @@ class AlergiaForm(forms.ModelForm):
         widgets = {
             'sustancia': forms.TextInput(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Ej: Penicilina, Maní, Polvo'
+                'placeholder': 'EX: Penicillin, pollen, peanuts'
             }),
             'descripcion': forms.Textarea(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
                 'rows': 3,
-                'placeholder': 'Describa los síntomas y reacciones'
+                'placeholder': 'Describe the symptoms and reactions'
             }),
             'severidad': forms.Select(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
@@ -133,10 +133,10 @@ class AlergiaForm(forms.ModelForm):
             }),
         }
         labels = {
-            'sustancia': 'Sustancia Alérgena',
-            'descripcion': 'Descripción',
-            'severidad': 'Severidad',
-            'fecha_diagnostico': 'Fecha de Diagnóstico',
+            'sustancia': 'Allergen Substance',
+            'descripcion': 'Description',
+            'severidad': 'Severity',
+            'fecha_diagnostico': 'Diagnosis Date',
         }
 
 
@@ -163,10 +163,10 @@ class CondicionMedicaForm(forms.ModelForm):
             }),
         }
         labels = {
-            'codigo': 'Código CIE-10',
-            'descripcion': 'Descripción',
-            'fecha_diagnostico': 'Fecha de Diagnóstico',
-            'estado': 'Estado',
+            'codigo': 'CIE-10 Code',
+            'descripcion': 'Description',
+            'fecha_diagnostico': 'Diagnosis Date',
+            'estado': 'Status',
         }
 
 
@@ -181,15 +181,15 @@ class TratamientoForm(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
                 'rows': 3,
-                'placeholder': 'Describa el tratamiento'
+                'placeholder': 'Describe the treatment'
             }),
             'dosis': forms.TextInput(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Ej: 500mg, 10ml'
+                'placeholder': 'EX: 500mg, 10ml'
             }),
             'frecuencia': forms.TextInput(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Ej: Cada 8 horas, Diario'
+                'placeholder': 'EX: Cada 8 horas, Diario'
             }),
             'fecha_inicio': forms.DateInput(attrs={
                 'type': 'date',
@@ -206,13 +206,13 @@ class TratamientoForm(forms.ModelForm):
             }),
         }
         labels = {
-            'medicamento': 'Medicamento',
-            'descripcion': 'Descripción del Tratamiento',
-            'dosis': 'Dosis',
-            'frecuencia': 'Frecuencia',
-            'fecha_inicio': 'Fecha de Inicio',
-            'fecha_fin': 'Fecha de Fin',
-            'observaciones': 'Observaciones',
+            'medicamento': 'Medication',
+            'descripcion': 'Treatment Description',
+            'dosis': 'Dosage',
+            'frecuencia': 'Frequency',
+            'fecha_inicio': 'Start Date',
+            'fecha_fin': 'End Date',
+            'observaciones': 'Observations',
         }
 
 
@@ -223,7 +223,7 @@ class PruebaLaboratorioForm(forms.ModelForm):
         widgets = {
             'nombre_prueba': forms.TextInput(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Ej: Hemograma completo, Glucosa en sangre'
+                'placeholder': 'EX: complete blood count, blood glucose'
             }),
             'fecha_realizacion': forms.DateInput(attrs={
                 'type': 'date',
@@ -232,29 +232,29 @@ class PruebaLaboratorioForm(forms.ModelForm):
             'resultados': forms.Textarea(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
                 'rows': 4,
-                'placeholder': 'Ingrese los resultados de la prueba'
+                'placeholder': 'Enter the test results'
             }),
             'valores_referencia': forms.Textarea(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
                 'rows': 3,
-                'placeholder': 'Valores de referencia normales'
+                'placeholder': 'Normal reference values'
             }),
             'observaciones': forms.Textarea(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
                 'rows': 2,
-                'placeholder': 'Observaciones del profesional'
+                'placeholder': 'Professional observations'
             }),
             'archivo_resultado': forms.FileInput(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
             }),
         }
         labels = {
-            'nombre_prueba': 'Nombre de la Prueba',
-            'fecha_realizacion': 'Fecha de Realización',
-            'resultados': 'Resultados',
-            'valores_referencia': 'Valores de Referencia',
-            'observaciones': 'Observaciones',
-            'archivo_resultado': 'Archivo de Resultados',
+            'nombre_prueba': 'Test Name',
+            'fecha_realizacion': 'Date of Performance',
+            'resultados': 'Results',
+            'valores_referencia': 'Reference Values',
+            'observaciones': 'Observations',
+            'archivo_resultado': 'Result File',
         }
 
 
@@ -265,7 +265,7 @@ class CirugiaForm(forms.ModelForm):
         widgets = {
             'nombre_cirugia': forms.TextInput(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Ej: Apendicectomía, Cesárea'
+                'placeholder': 'EX: Appendectomy, Cesarean section'
             }),
             'fecha_cirugia': forms.DateInput(attrs={
                 'type': 'date',
@@ -274,21 +274,21 @@ class CirugiaForm(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
                 'rows': 4,
-                'placeholder': 'Describa el procedimiento quirúrgico'
+                'placeholder': 'Describe the surgical procedure'
             }),
             'complicaciones': forms.Textarea(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
                 'rows': 3,
-                'placeholder': 'Complicaciones postoperatorias (si las hubo)'
+                'placeholder': 'Postoperative complications (if any)'
             }),
             'estado': forms.Select(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
             }),
         }
         labels = {
-            'nombre_cirugia': 'Nombre de la Cirugía',
-            'fecha_cirugia': 'Fecha de la Cirugía',
-            'descripcion': 'Descripción',
-            'complicaciones': 'Complicaciones',
-            'estado': 'Estado',
+            'nombre_cirugia': 'Surgery Name',
+            'fecha_cirugia': 'Surgery Date',
+            'descripcion': 'Description',
+            'complicaciones': 'Complications',
+            'estado': 'Status',
         }
