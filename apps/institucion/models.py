@@ -42,6 +42,8 @@ class Cama(models.Model):
         blank=True,
         related_name='camas'
     )
+    class Meta:
+        unique_together = ('numero', 'sala')
 
     def __str__(self):
         enfermero = f" - Enfermero: {self.enfermero_asignado}" if self.enfermero_asignado else " - Sin enfermero asignado"
