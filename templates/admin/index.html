@@ -2,50 +2,17 @@
 {% load i18n static %}
 
 {% block sidebar %}
-<div style="padding: 20px; background: #f8f9fa; border-radius: 8px; margin-bottom: 20px;">
-    <h3 style="color: #495057; margin-bottom: 15px; font-size: 18px;">📊 Estadísticas del Sistema</h3>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-        <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <div style="font-size: 24px; margin-bottom: 5px;">👥</div>
-            <div style="font-size: 20px; font-weight: bold; color: #007bff;">{{ total_pacientes }}</div>
-            <div style="color: #6c757d; font-size: 14px;">Pacientes</div>
-        </div>
-        <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <div style="font-size: 24px; margin-bottom: 5px;">👨‍⚕️</div>
-            <div style="font-size: 20px; font-weight: bold; color: #28a745;">{{ total_profesionales }}</div>
-            <div style="color: #6c757d; font-size: 14px;">Profesionales</div>
-        </div>
-        <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <div style="font-size: 24px; margin-bottom: 5px;">🔗</div>
-            <div style="font-size: 20px; font-weight: bold; color: #6f42c1;">{{ total_hashes }}</div>
-            <div style="color: #6c757d; font-size: 14px;">Hashes</div>
-        </div>
-        <div style="background: white; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <div style="font-size: 24px; margin-bottom: 5px;">⚡</div>
-            <div style="font-size: 20px; font-weight: bold; color: #fd7e14;">Activo</div>
-            <div style="color: #6c757d; font-size: 14px;">Estado</div>
-        </div>
-    </div>
-</div>
 
-<div style="padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-    <h3 style="color: #495057; margin-bottom: 15px; font-size: 18px;">🚀 Acciones Rápidas</h3>
+<div style="padding: 20px; border-radius: 8px;">
+    <h3 style="margin-bottom: 15px; font-size: 18px; color: #fff;">Acciones Rápidas</h3>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
         <a href="{% url 'users:registro_profesional' %}"
-           style="display: block; padding: 15px; background: #dc3545; color: white; text-decoration: none; border-radius: 6px; text-align: center; transition: background 0.3s;">
-            👨‍⚕️<br><strong>Registrar Profesional</strong>
+           style="display: flex; align-items: center; justify-content: center; padding: 15px; background: #dc3545; color: white; text-decoration: none; border-radius: 6px; text-align: center; transition: background 0.3s; min-height: 60px;">
+            <strong>Registrar Profesional</strong>
         </a>
         <a href="{% url 'users:blockchain_status' %}"
-           style="display: block; padding: 15px; background: #007bff; color: white; text-decoration: none; border-radius: 6px; text-align: center; transition: background 0.3s;">
-            🔗<br><strong>Estado Blockchain</strong>
-        </a>
-        <a href="{% url 'admin:users_paciente_changelist' %}"
-           style="display: block; padding: 15px; background: #28a745; color: white; text-decoration: none; border-radius: 6px; text-align: center; transition: background 0.3s;">
-            👥<br><strong>Gestionar Pacientes</strong>
-        </a>
-        <a href="{% url 'admin:users_profesional_changelist' %}"
-           style="display: block; padding: 15px; background: #6f42c1; color: white; text-decoration: none; border-radius: 6px; text-align: center; transition: background 0.3s;">
-            📋<br><strong>Gestionar Profesionales</strong>
+           style="display: flex; align-items: center; justify-content: center; padding: 15px; background: #007bff; color: white; text-decoration: none; border-radius: 6px; text-align: center; transition: background 0.3s; min-height: 60px;">
+            <strong>Estado Blockchain</strong>
         </a>
     </div>
 </div>
