@@ -10,7 +10,7 @@ urlpatterns = [
     path("", views.user_list, name="user_list"),
     path('me/', views.perfil_paciente, name='mi_perfil'),
     path('<int:paciente_id>/', views.perfil_paciente, name='perfil_paciente'),
-    path("<int:user_id>/delete/", views.user_delete, name="user_delete"),
+    # path("<int:user_id>/delete/", views.user_delete, name="user_delete"),
     
     # Vistas médicas principales
     path('panel-profesional/', views.panel_profesional, name='panel_profesional'),

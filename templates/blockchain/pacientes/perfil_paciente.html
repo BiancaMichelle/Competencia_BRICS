@@ -16,6 +16,9 @@
                         <p><span class="font-semibold">Tipo de Sangre:</span> {{ paciente.tipo_sangre|default:"No especificado" }}</p>
                         <p><span class="font-semibold">Teléfono:</span> {{ paciente.telefono }}</p>
                         <p><span class="font-semibold">Email:</span> {{ paciente.user.email }}</p>
+                        {% if es_propio_perfil and primer_hash %}
+                        <p><span class="font-semibold">Primer Hash:</span> <span class="font-mono text-xs bg-gray-100 px-1 rounded">{{ primer_hash.hash_value }}</span></p>
+                        {% endif %}
                     </div>
                 </div>
                 
@@ -191,39 +194,6 @@
             </div>
         </div>
 
-        <!-- Blockchain Info (para futura implementación) -->
-        {% if user.profesional or es_propio_perfil %}
-        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl shadow-lg mt-8 border border-indigo-200">
-            <h2 class="text-xl font-bold text-indigo-800 mb-4 flex items-center">
-                <span class="w-3 h-3 bg-indigo-500 rounded-full mr-2"></span>
-                Información de Blockchain
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                    <span class="font-semibold text-indigo-700">Hash del Paciente:</span>
-                    <p class="text-indigo-600 font-mono text-xs break-all">{{ paciente.blockchain_hash|default:"Pendiente de generación" }}</p>
-                </div>
-                <div>
-                    <span class="font-semibold text-indigo-700">Último Bloque:</span>
-                    <p class="text-indigo-600 font-mono text-xs break-all">{{ paciente.ultimo_bloque_actualizado|default:"No sincronizado" }}</p>
-                </div>
-                <div>
-                    <span class="font-semibold text-indigo-700">Última Actualización:</span>
-                    <p class="text-indigo-600">{{ paciente.fecha_ultimo_hash|default:"Nunca" }}</p>
-                </div>
-                <div>
-                    <span class="font-semibold text-indigo-700">Estado:</span>
-                    <p class="text-indigo-600">
-                        {% if paciente.blockchain_hash %}
-                            <span class="text-green-600">✓ Sincronizado</span>
-                        {% else %}
-                            <span class="text-yellow-600">⚠ Pendiente</span>
-                        {% endif %}
-                    </p>
-                </div>
-            </div>
-        </div>
-        {% endif %}
 {% endblock %}
 
 {% block scripts %}

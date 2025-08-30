@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
@@ -74,12 +74,9 @@ def agregar_alergia(request, paciente_id):
         BlockchainService.create_patient_version(paciente, created_by=request.user)
 
         messages.success(request, 'Alergia agregada exitosamente.')
-        # Redirigir al perfil del paciente para mostrar el mensaje
-        return redirect('users:perfil_paciente', paciente.id)
+        return JsonResponse({'status': 'success', 'message': 'Alergia agregada exitosamente.', 'alergia_id': alergia.id})
 
-    # En caso de error, renderizamos el formulario con los errores y mostramos mensaje
-    messages.error(request, 'Hay errores en el formulario. Por favor corrige los campos indicados.')
-    return render(request, 'blockchain/forms/alergia_form.html', {'form': form, 'paciente': paciente})
+    return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -100,10 +97,9 @@ def agregar_condicion(request, paciente_id):
         BlockchainService.create_patient_version(paciente, created_by=request.user)
 
         messages.success(request, 'Condición médica agregada exitosamente.')
-        return redirect('users:perfil_paciente', paciente.id)
+        return JsonResponse({'status': 'success', 'message': 'Condición médica agregada exitosamente.', 'condicion_id': condicion.id})
 
-    messages.error(request, 'Hay errores en el formulario. Por favor corrige los campos indicados.')
-    return render(request, 'blockchain/forms/condicion_form.html', {'form': form, 'paciente': paciente})
+    return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -130,10 +126,9 @@ def agregar_tratamiento(request, paciente_id):
         BlockchainService.create_patient_version(paciente, created_by=request.user)
 
         messages.success(request, 'Tratamiento agregado exitosamente.')
-        return redirect('users:perfil_paciente', paciente.id)
+        return JsonResponse({'status': 'success', 'message': 'Tratamiento agregado exitosamente.', 'tratamiento_id': tratamiento.id})
 
-    messages.error(request, 'Hay errores en el formulario. Por favor corrige los campos indicados.')
-    return render(request, 'blockchain/forms/tratamiento_form.html', {'form': form, 'paciente': paciente})
+    return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
 
 
 @login_required

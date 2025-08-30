@@ -266,10 +266,9 @@ class BlockchainService:
         hash_value = hashlib.sha256(hash_input.encode()).hexdigest()
 
         content_type = 'Patient'
-        # previous hash por paciente (cadena por objeto)
+        # previous hash global (último hash en la cadena)
         previous_hash_obj = BlockchainHash.objects.filter(
-            content_type=content_type,
-            object_id=paciente.pk
+            content_type=content_type
         ).order_by('-timestamp').first()
 
         previous_hash = previous_hash_obj.hash_value if previous_hash_obj else "0"
@@ -311,15 +310,6 @@ class BlockchainService:
                 return False, f"Cadena rota en hash ID {hash_obj.id}"
         
         return True, "Cadena íntegra"
-
-
-
-@receiver(post_save, sender=Paciente)
-def create_patient_hash(sender, instance, created, **kwargs):
-    """Crea hash blockchain cuando se crea o actualiza un paciente"""
-    if created or kwargs.get('update_fields'):
-        BlockchainService.create_blockchain_hash(instance)
-
 
 # MODELO PARA AUDITORÍA Y VERSIONADO
 class MedicalRecordVersion(models.Model):

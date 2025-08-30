@@ -9,6 +9,7 @@ from django.db.models import Q
 
 from .forms import BuscarPacienteForm, PacienteForm, PacienteRegistroForm, ProfesionalForm, ProfesionalRegistroForm
 from .models import Paciente, Profesional
+from apps.blockchain.models import BlockchainHash
 
 def is_superuser(user):
     return user.is_superuser
@@ -41,8 +42,20 @@ def perfil_paciente(request, paciente_id=None):
         paciente = get_object_or_404(Paciente, id=paciente_id)
         # autorización: admin/staff (usando admin_required) o propietario
         is_owner = getattr(request.user, 'paciente', None) and request.user.paciente.id == paciente.id
-        if not (admin_required(request.user) or is_owner):
-            raise PermissionDenied
+        if not is_owner:
+            # Check if verified via session
+            session_key = f'verified_paciente_{paciente.id}'
+            if not request.session.get(session_key, False):
+                if request.method == 'POST' and 'password' in request.POST:
+                    password = request.POST['password']
+                    first_hash = BlockchainHash.objects.filter(content_type='Patient', object_id=paciente.id).order_by('timestamp').first()
+                    if first_hash and first_hash.hash_value == password:
+                        request.session[session_key] = True
+                    else:
+                        messages.error(request, 'Clave incorrecta.')
+                        return render(request, 'blockchain/pacientes/perfil_paciente_password.html', {'paciente': paciente})
+                else:
+                    return render(request, 'blockchain/pacientes/perfil_paciente_password.html', {'paciente': paciente})
         es_propio_perfil = bool(is_owner)
     else:
         # El paciente está viendo su propio perfil
@@ -62,14 +75,16 @@ def perfil_paciente(request, paciente_id=None):
         'tratamientos': paciente.tratamientos.all() if hasattr(paciente, 'tratamientos') else [],
         'pruebas': paciente.pruebas.all() if hasattr(paciente, 'pruebas') else [],
         'cirugias': paciente.cirugias.all() if hasattr(paciente, 'cirugias') else [],
+        # Primer hash del paciente (solo para el propietario)
+        'primer_hash': BlockchainHash.objects.filter(content_type='Patient', object_id=paciente.id).order_by('timestamp').first() if es_propio_perfil else None,
     }
     return render(request, 'blockchain/pacientes/perfil_paciente.html', context)
 
-@user_passes_test(is_superuser)
-def user_delete(request, user_id):
-    user = get_object_or_404(User, pk=user_id)
-    user.delete()
-    return redirect("users:user_list")
+# @user_passes_test(is_superuser)
+# def user_delete(request, user_id):
+#     user = get_object_or_404(User, pk=user_id)
+#     user.delete()
+#     return redirect("users:user_list")
 
 
 @login_required
