@@ -4,7 +4,9 @@
 {% block title %}Professional Registration - Administrator{% endblock %}
 
 {% block extra_css %}
+{% if '/admin/' not in request.path %}
 <link href="{% static 'css/output.css' %}" rel="stylesheet">
+{% endif %}
 {% endblock %}
 
 {% block content %}
