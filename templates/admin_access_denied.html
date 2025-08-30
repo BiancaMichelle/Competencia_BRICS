@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 
-{% block title %}Acceso Denegado{% endblock %}
+{% block title %}Access Denied{% endblock %}
 
 {% block content %}
 <div class="min-h-screen flex items-center justify-center bg-gray-50">
@@ -18,20 +18,20 @@
             
             <!-- Mensaje -->
             <p class="mt-2 text-sm text-gray-600">
-                No tienes permisos para acceder al panel de administración. 
-                Solo los Administradores pueden acceder a esta sección.
+                You do not have permission to access the admin panel.
+                Only Administrators can access this section.
             </p>
             
             <!-- Botones de acción -->
             <div class="mt-6 flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
                 <a href="{% url 'core:index' %}" 
                    class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 text-center">
-                    Ir al Inicio
+                    Go to Home
                 </a>
                 {% if not user.is_authenticated %}
                 <a href="{% url 'login' %}" 
                    class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors duration-200 text-center">
-                    Iniciar Sesión
+                    Log In
                 </a>
                 {% endif %}
             </div>

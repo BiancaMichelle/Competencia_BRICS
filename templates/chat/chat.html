@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 
-{% block title %}Chat IA Médico{% endblock %}
+{% block title %}Medical AI Chat{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -178,13 +178,13 @@
                 </svg>
             </div>
             <div>
-                <h1 class="text-xl font-bold text-gray-800">Chat IA Médico</h1>
-                <p class="text-sm text-gray-600">Asistente virtual especializado en medicina</p>
+                <h1 class="text-xl font-bold text-gray-800">Medical AI Chat</h1>
+                <p class="text-sm text-gray-600">Virtual assistant specialized in medicine</p>
             </div>
             <div class="ml-auto">
                 <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
                     <span class="w-2 h-2 bg-green-500 rounded-full inline-block mr-1"></span>
-                    En línea
+                    Online
                 </span>
             </div>
         </div>
@@ -204,13 +204,13 @@
                     </div>
                 </div>
                 <div class="chat-header text-sm text-gray-600 mb-1">
-                    IA Médica
-                    <time class="text-xs opacity-50 ml-2">Ahora</time>
+                    Medical AI
+                    <time class="text-xs opacity-50 ml-2">Now</time>
                 </div>
                 <div class="chat-bubble chat-bubble-accent">
-                    ¡Hola! Soy tu asistente médico virtual. Estoy aquí para ayudarte con consultas médicas, información sobre síntomas, tratamientos y más. 
+                    ¡Hi! I am your virtual medical assistant. I am here to help you with medical inquiries, information about symptoms, treatments, and more.
                     <br><br>
-                    <strong>¿En qué puedo ayudarte hoy?</strong>
+                    <strong>How can I assist you today?</strong>
                 </div>
             </div>
 
@@ -225,7 +225,7 @@
                     </div>
                 </div>
                 <div class="chat-header text-sm text-gray-600 mb-1">
-                    Tú
+                    You
                     <time class="text-xs opacity-50 ml-2">{{ "now"|date:"H:i" }}</time>
                 </div>
                 <div class="chat-bubble chat-bubble-primary">{{ user_message }}</div>
@@ -242,7 +242,7 @@
                     </div>
                 </div>
                 <div class="chat-header text-sm text-gray-600 mb-1">
-                    IA Médica
+                    Medical AI
                     <time class="text-xs opacity-50 ml-2">{{ "now"|date:"H:i" }}</time>
                 </div>
                 <div class="chat-bubble chat-bubble-accent">{{ ai_response }}</div>
@@ -266,7 +266,7 @@
                     </div>
                 </div>
                 <div class="chat-header text-sm text-gray-600 mb-1">
-                    IA Médica está escribiendo...
+                    Medical AI is typing...
                 </div>
                 <div class="typing-indicator">
                     <div class="typing-dots">
@@ -313,7 +313,7 @@
                 </button>
             </form>
             <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
-                <span>Presiona Enter para enviar</span>
+                <span>Press Enter to send</span>
                 <span id="charCount">0/1000</span>
             </div>
         </div>

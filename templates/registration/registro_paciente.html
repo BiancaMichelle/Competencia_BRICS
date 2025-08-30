@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% block title %}Registro Paciente{% endblock %}
+{% block title %}Patient Registration{% endblock %}
 
 {% block content %}
 <body class="bg-gray-100 min-h-screen">
@@ -9,8 +9,8 @@
             <!-- Header -->
             <div class="text-center mb-8">
                 <img src="{% static 'img/logo.jpg' %}" alt="ARQA Logo" class="h-16 w-auto mx-auto mb-4">
-                <h1 class="text-3xl font-bold text-gray-800">Registro de Paciente</h1>
-                <p class="text-gray-600 mt-2">Complete la información para crear su cuenta</p>
+                <h1 class="text-3xl font-bold text-gray-800">Patient registration</h1>
+                <p class="text-gray-600 mt-2">Complete the information to create your account</p>
             </div>
 
             <!-- Formulario -->
@@ -29,7 +29,7 @@
                     <!-- Información de Usuario -->
                     <div>
                         <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
-                            Información de Usuario
+                            user information
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {% for field in user_form %}
@@ -57,7 +57,7 @@
                     <!-- Información Personal -->
                     <div>
                         <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
-                            Información Personal
+                            Personal Information
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {% for field in paciente_form %}
@@ -85,10 +85,10 @@
                     <!-- Botones -->
                     <div class="flex space-x-4 pt-6 border-t border-gray-200">
                         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-300">
-                            Crear Cuenta
+                        Create account
                         </button>
                         <a href="{% url 'core:index' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-8 rounded-lg transition-colors duration-300">
-                            Cancelar
+                            Cancel
                         </a>
                     </div>
                 </form>
@@ -96,8 +96,8 @@
                 <!-- Enlaces adicionales -->
                 <div class="mt-6 pt-6 border-t border-gray-200 text-center">
                     <p class="text-gray-600">
-                        ¿Ya tienes una cuenta? 
-                        <a href="{% url 'login' %}" class="text-blue-600 hover:text-blue-800 font-semibold">Inicia sesión aquí</a>
+                        You do not have an account? 
+                        <a href="{% url 'login' %}" class="text-blue-600 hover:text-blue-800 font-semibold">Sign in here</a>
                     </p>
                     <!-- Registro de profesional removido - Solo accesible para superadmin -->
                 </div>

@@ -1,15 +1,15 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% block title %}Formulario |{% endblock %}
+{% block title %}Form |{% endblock %}
 
 {% block content %}
     <div class="container mx-auto px-6 py-8">
         <div class="max-w-2xl mx-auto">
             <!-- Header -->
             <div class="bg-white p-6 rounded-t-2xl shadow-lg border-b border-gray-200">
-                <h1 class="text-2xl font-bold text-gray-800">{% block form_title %}Formulario{% endblock %}</h1>
+                <h1 class="text-2xl font-bold text-gray-800">{% block form_title %}Form{% endblock %}</h1>
                 {% if paciente %}
-                    <p class="text-gray-600 mt-2">Paciente: {{ paciente.user.first_name }} {{ paciente.user.last_name }}</p>
+                    <p class="text-gray-600 mt-2">Patient: {{ paciente.user.first_name }} {{ paciente.user.last_name }}</p>
                 {% endif %}
             </div>
 
@@ -51,10 +51,10 @@
                     <!-- Buttons -->
                     <div class="flex space-x-4 pt-6 border-t border-gray-200">
                         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300">
-                            {% block submit_text %}Guardar{% endblock %}
+                            {% block submit_text %}Save{% endblock %}
                         </button>
                         <a href="{% block cancel_url %}javascript:history.back(){% endblock %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-6 rounded-lg transition-colors duration-300">
-                            Cancelar
+                            Cancel
                         </a>
                     </div>
                 </form>

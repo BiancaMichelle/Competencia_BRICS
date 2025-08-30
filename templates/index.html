@@ -6,31 +6,31 @@
 <div class="hero min-h-screen bg-base-200">
     <div class="hero-content text-center">
         <div class="max-w-md">
-            <h1 class="text-5xl font-bold">¡Bienvenido a ARQA!</h1>
+            <h1 class="text-5xl font-bold">¡Welcome to ARQA!</h1>
             <p class="py-6">
-                Sistema de gestión blockchain para el sector salud. 
-                Una plataforma innovadora que garantiza la seguridad y transparencia 
-                de los datos médicos.
+                Blockchain management system for the healthcare sector. 
+                An innovative platform that ensures the security and transparency
+                of medical data.
             </p>
             {% if user.is_authenticated %}
                 <div class="space-y-4">
-                    <p class="text-lg">¡Hola, <span class="font-semibold text-primary">{{ user.username }}</span>!</p>
+                    <p class="text-lg">¡Hi, <span class="font-semibold text-primary">{{ user.username }}</span>!</p>
                     <div class="flex gap-4 justify-center">
                         {% if user.profesional %}
-                            <a href="{% url 'users:panel_profesional' %}" class="btn btn-secondary">Panel Profesional</a>
+                            <a href="{% url 'users:panel_profesional' %}" class="btn btn-secondary">Professional Panel</a>
                         {% else %}
-                            <a href="{% url 'users:mi_perfil' %}" class="btn btn-accent">Ver Perfil</a>
+                            <a href="{% url 'users:mi_perfil' %}" class="btn btn-accent">View Profile</a>
                         {% endif %}
-                        <a href="{% url 'logout' %}" class="btn btn-outline">Cerrar Sesión</a>
+                        <a href="{% url 'logout' %}" class="btn btn-outline">Log Out</a>
                     </div>
                 </div>
             {% else %}
                 <div class="space-y-4">
-                    <a class="btn btn-primary" href="{% url 'login' %}">Iniciar Sesión</a>
-                    <div class="divider">O regístrate como:</div>
+                    <a class="btn btn-primary" href="{% url 'login' %}">Log In</a>
+                    <div class="divider">Or register as:</div>
                     <div class="flex gap-4 justify-center">
                         <a href="{% url 'users:registro_paciente' %}" class="btn btn-outline btn-primary">
-                            Paciente
+                            Patient
                         </a>
                     </div>
                 </div>
@@ -42,9 +42,9 @@
 <!-- Sección de características -->
 <div class="bg-base-100 py-16">
     <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-12">Características Principales</h2>
+        <h2 class="text-3xl font-bold text-center mb-12">Main Features</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Característica 1 -->
+            <!-- Feature 1 -->
             <div class="card bg-base-200 shadow-xl">
                 <div class="card-body text-center">
                     <div class="avatar placeholder mb-4">
@@ -52,12 +52,12 @@
                             <span class="text-2xl">🔒</span>
                         </div>
                     </div>
-                    <h3 class="card-title justify-center">Seguridad</h3>
-                    <p>Tecnología blockchain para garantizar la integridad y seguridad de los datos médicos.</p>
+                    <h3 class="card-title justify-center">Security</h3>
+                    <p>Blockchain technology to ensure the integrity and security of medical data.</p>
                 </div>
             </div>
 
-            <!-- Característica 2 -->
+            <!-- Feature 2 -->
             <div class="card bg-base-200 shadow-xl">
                 <div class="card-body text-center">
                     <div class="avatar placeholder mb-4">
@@ -65,12 +65,12 @@
                             <span class="text-2xl">👥</span>
                         </div>
                     </div>
-                    <h3 class="card-title justify-center">Colaboración</h3>
-                    <p>Facilita la comunicación entre pacientes y profesionales de la salud.</p>
+                    <h3 class="card-title justify-center">Collaboration</h3>
+                    <p>Facilitates communication between patients and healthcare professionals.</p>
                 </div>
             </div>
 
-            <!-- Característica 3 -->
+            <!-- Feature 3 -->
             <div class="card bg-base-200 shadow-xl">
                 <div class="card-body text-center">
                     <div class="avatar placeholder mb-4">
@@ -78,8 +78,8 @@
                             <span class="text-2xl">📊</span>
                         </div>
                     </div>
-                    <h3 class="card-title justify-center">Transparencia</h3>
-                    <p>Registro transparente e inmutable de todas las transacciones y consultas médicas.</p>
+                    <h3 class="card-title justify-center">Transparency</h3>
+                    <p>Transparent and immutable record of all medical transactions and inquiries.</p>
                 </div>
             </div>
         </div>

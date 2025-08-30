@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 
-{% block title %}Registro de Profesional - Administrador{% endblock %}
+{% block title %}Professional Registration - Administrator{% endblock %}
 
 {% block extra_css %}
 <link href="{% static 'css/output.css' %}" rel="stylesheet">
@@ -20,10 +20,10 @@
                 </div>
                 <div class="ml-3">
                     <h3 class="text-sm font-medium text-red-800">
-                        Área Restringida - Solo Administradores
+                        Restricted area - Only Administrators
                     </h3>
                     <div class="mt-2 text-sm text-red-700">
-                        <p>Esta función está restringida únicamente para superadministradores. Solo los administradores del sistema pueden registrar nuevos profesionales de la salud.</p>
+                        <p>This function is restricted solely for super administrators. Only system administrators can register new healthcare professionals.</p>
                     </div>
                 </div>
             </div>
@@ -42,8 +42,8 @@
                         </div>
                     </div>
                     <div class="ml-4">
-                        <h1 class="text-2xl font-bold text-white">Registro de Profesional</h1>
-                        <p class="text-red-100">Panel de Administración del Sistema</p>
+                        <h1 class="text-2xl font-bold text-white">Professional Registration</h1>
+                        <p class="text-red-100">System Administration Panel</p>
                     </div>
                 </div>
             </div>
@@ -59,7 +59,7 @@
                             <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
-                            Datos del Usuario
+                            User Information
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -125,7 +125,7 @@
                             <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
-                            Información Profesional
+                            Professional Information
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -174,14 +174,14 @@
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                             </svg>
-                            Registrar Profesional
+                            Register Professional
                         </button>
                         <a href="{% url 'admin:index' %}" 
                            class="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transform transition-all duration-200 hover:scale-[1.02] flex items-center justify-center">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                             </svg>
-                            Volver al Dashboard
+                            Back to Dashboard
                         </a>
                     </div>
                 </form>
@@ -191,7 +191,7 @@
         <!-- Información adicional -->
         <div class="mt-6 text-center">
             <p class="text-sm text-gray-600">
-                ⚠️ Solo los superadministradores pueden acceder a esta funcionalidad
+                ⚠️ Only administrators can access this feature.
             </p>
         </div>
     </div>
