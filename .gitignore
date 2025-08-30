@@ -7,6 +7,37 @@ docs/
 venv
 staticfiles
 .env
+.env.local
+.env.production
 *.sqlite3
 spring-ia/
 app/tailwindcss.exe
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Media files
+media/
+
+# Static files
+static/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp

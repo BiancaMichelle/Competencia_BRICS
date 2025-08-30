@@ -1,13 +1,76 @@
 # Sistema Médico Blockchain - ARQA
 
-Sistema de gestión médica con tecnología blockchain para garantizar la integridad y trazabilidad de los datos médicos.
+Sistema de g### ### 3. Configuración rápida (Recomendado)
+
+**En Windows:**
+```bash
+setup.bat
+```
+
+**En Linux/Mac:**
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+Esto automáticamente:
+- Crea el entorno virtual
+- Instala todas las dependencias
+- Configura las variables de entorno
+- Ejecuta las migraciones
+- Compila el CSS
+
+### 4. Configuración manual
+
+Si prefieres configurar manualmente:
+
+```bash
+# Crear entorno virtual
+python -m venv venv
+
+# Activar entorno virtual
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
+
+# Instalar dependencias
+pip install -r requirements.txt
+npm install
+```
+
+### 5. Configurar variables de entornoariables de entorno
+
+Crea un archivo `.env` en la raíz del proyecto copiando el archivo de ejemplo:
+
+```bash
+cp .env.example .env
+```
+
+Edita el archivo `.env` con tus configuraciones específicas:
+
+```env
+# Django Configuration
+SECRET_KEY=tu-clave-secreta-aqui
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Polygon Configuration
+POLYGON_RPC_URL=https://polygon-mainnet.infura.io/v3/TU_INFURA_PROJECT_ID
+
+# Filecoin Configuration (opcional)
+FILECOIN_API_URL=https://api.filecoin.io
+FILECOIN_API_KEY=tu_filecoin_api_key
+```
+
+### 6. Instalar dependencias de Node.js (para Tailwind CSS)stión médica con integración blockchain usando Polygon y Filecoin para garantizar la integridad y trazabilidad de los datos médicos.
 
 ## 🚀 Características
 
 - **Dashboard médico profesional** con métricas y estadísticas en tiempo real
 - **Sistema de pacientes y profesionales** con roles diferenciados
-- **Blockchain para integridad de datos** - Todos los registros médicos se almacenan con hash verificable
-- **Registro de profesionales restringido** - Solo superadministradores pueden registrar médicos
+- **Integración con Polygon** para transacciones rápidas y baratas
+- **Almacenamiento en Filecoin** para archivos médicos distribuidos
 - **Interfaz moderna** con Tailwind CSS y Alpine.js
 - **Sistema de verificación** automática de integridad de datos
 
@@ -16,6 +79,8 @@ Sistema de gestión médica con tecnología blockchain para garantizar la integr
 - Python 3.8+
 - Node.js (para Tailwind CSS)
 - Git
+- Cuenta en Infura/Alchemy para Polygon RPC
+- API key de Filecoin (opcional)
 
 ## 🛠️ Instalación
 
@@ -130,7 +195,8 @@ project-blockchain-ia-foz/
 ## 🛡️ Seguridad
 
 - **Registro de profesionales restringido**: Solo superadministradores pueden crear cuentas de médicos
-- **Integridad blockchain**: Todos los registros médicos se almacenan con hash verificable
+- **Integración con Polygon**: Transacciones seguras y verificables en blockchain
+- **Almacenamiento en Filecoin**: Archivos médicos distribuidos y resistentes a la censura
 - **Autenticación requerida**: Sistema de login obligatorio para acceder a funcionalidades
 
 ## 🚨 Solución de Problemas Comunes
@@ -158,6 +224,7 @@ python manage.py createsuperuser
 - El sistema usa SQLite por defecto (incluido en el .gitignore)
 - Los archivos `__pycache__` están excluidos del repositorio
 - Tailwind CSS se compila automáticamente con `npm run build-css`
+- Ver [ENVIRONMENT.md](ENVIRONMENT.md) para configuración detallada de variables de entorno
 
 ## 🤝 Contribución
 

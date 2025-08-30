@@ -27,7 +27,6 @@
                         <a href="#" onclick="showView('historial-view')" id="nav-historial" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Mi Historial Médico</a>
                     {% endif %}
                     {% if user.is_superuser %}
-                        <a href="{% url 'blockchain:blockchain_dashboard' %}" onclick="showView('blockchain-view')" id="nav-blockchain" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Blockchain</a>
                         <a href="{% url 'admin:index' %}" onclick="showView('admin-view')" id="nav-admin" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">Panel de administrador</a>
                     {% endif %}
                     
