@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'core',                   # Módulo principal
     'apps.chat',             # Módulo de chat
     'apps.users',            # Módulo de usuarios
+    'apps.institucion',           # Módulo de de gestion institucional
 ]
 
 MIDDLEWARE = [

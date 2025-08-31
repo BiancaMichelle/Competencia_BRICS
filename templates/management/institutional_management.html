@@ -1,0 +1,96 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Panel de Gestión Institucional{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/output.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-gray-800 text-center">Panel de Gestión Institucional</h1>
+        
+        <!-- Cards resumen -->
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-12">
+            <div class="bg-white shadow rounded-xl p-6 flex flex-col items-center">
+                <span class="text-3xl text-indigo-600 mb-2">🛏️</span>
+                <span class="text-lg font-semibold">Camas</span>
+                <span class="text-2xl font-bold mt-2">{{ total_camas }}</span>
+            </div>
+            <div class="bg-white shadow rounded-xl p-6 flex flex-col items-center">
+                <span class="text-3xl text-blue-600 mb-2">🧑‍⚕️</span>
+                <span class="text-lg font-semibold">Enfermeros</span>
+                <span class="text-2xl font-bold mt-2">{{ total_enfermeros }}</span>
+            </div>
+            <div class="bg-white shadow rounded-xl p-6 flex flex-col items-center">
+                <span class="text-3xl text-green-600 mb-2">🔧</span>
+                <span class="text-lg font-semibold">Operarios</span>
+                <span class="text-2xl font-bold mt-2">{{ total_operarios }}</span>
+            </div>
+            <div class="bg-white shadow rounded-xl p-6 flex flex-col items-center">
+                <span class="text-3xl text-purple-600 mb-2">🏥</span>
+                <span class="text-lg font-semibold">Salas</span>
+                <span class="text-2xl font-bold mt-2">{{ total_salas }}</span>
+            </div>
+            <div class="bg-white shadow rounded-xl p-6 flex flex-col items-center">
+                <span class="text-3xl text-pink-600 mb-2">👨‍⚕️</span>
+                <span class="text-lg font-semibold">Médicos</span>
+                <span class="text-2xl font-bold mt-2">{{ total_medicos }}</span>
+            </div>
+            <div class="bg-white shadow rounded-xl p-6 flex flex-col items-center">
+                <span class="text-3xl text-yellow-600 mb-2">🧑‍💼</span>
+                <span class="text-lg font-semibold">Pacientes</span>
+                <span class="text-2xl font-bold mt-2">{{ total_pacientes }}</span>
+            </div>
+        </div>
+
+        <!-- Accesos rápidos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <a href="{% url 'registrar_cama' %}" class="block bg-white shadow-lg rounded-xl p-8 hover:shadow-2xl transition">
+                <div class="flex items-center mb-4">
+                    <span class="text-3xl text-indigo-600 mr-3">🛏️</span>
+                    <span class="text-xl font-semibold">Registrar Camas</span>
+                </div>
+                <p class="text-gray-600">Gestione el registro y administración de camas hospitalarias.</p>
+            </a>
+            <a href="{% url 'registrar_enfermero' %}" class="block bg-white shadow-lg rounded-xl p-8 hover:shadow-2xl transition">
+                <div class="flex items-center mb-4">
+                    <span class="text-3xl text-blue-600 mr-3">🧑‍⚕️</span>
+                    <span class="text-xl font-semibold">Registrar Enfermeros</span>
+                </div>
+                <p class="text-gray-600">Gestione el registro y administración de enfermeros.</p>
+            </a>
+            <a href="{% url 'registrar_operario' %}" class="block bg-white shadow-lg rounded-xl p-8 hover:shadow-2xl transition">
+                <div class="flex items-center mb-4">
+                    <span class="text-3xl text-green-600 mr-3">🔧</span>
+                    <span class="text-xl font-semibold">Registrar Operarios</span>
+                </div>
+                <p class="text-gray-600">Gestione el registro y administración de operarios.</p>
+            </a>
+            <a href="{% url 'registrar_sala' %}" class="block bg-white shadow-lg rounded-xl p-8 hover:shadow-2xl transition">
+                <div class="flex items-center mb-4">
+                    <span class="text-3xl text-purple-600 mr-3">🏥</span>
+                    <span class="text-xl font-semibold">Registrar Salas</span>
+                </div>
+                <p class="text-gray-600">Gestione el registro y administración de salas.</p>
+            </a>
+            <a href="{% url 'users:registro_profesional' %}" class="block bg-white shadow-lg rounded-xl p-8 hover:shadow-2xl transition">
+                <div class="flex items-center mb-4">
+                    <span class="text-3xl text-pink-600 mr-3">👨‍⚕️</span>
+                    <span class="text-xl font-semibold">Registrar Médicos</span>
+                </div>
+                <p class="text-gray-600">Gestione el registro y administración de médicos.</p>
+            </a>
+            <a href="{% url 'users:registro_paciente' %}" class="block bg-white shadow-lg rounded-xl p-8 hover:shadow-2xl transition">
+                <div class="flex items-center mb-4">
+                    <span class="text-3xl text-yellow-600 mr-3">🧑‍💼</span>
+                    <span class="text-xl font-semibold">Registrar Pacientes</span>
+                </div>
+                <p class="text-gray-600">Gestione el registro y administración de pacientes.</p>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

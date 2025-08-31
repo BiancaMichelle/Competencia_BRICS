@@ -104,7 +104,7 @@
         const canvas = document.getElementById('login-canvas');
         const ctx = canvas.getContext('2d');
         const particles = [];
-        const numParticles = 80;
+        const numParticles = 100;
         const connectionDistance = 120;
 
         // Función para ajustar el tamaño del canvas al de la ventana
@@ -131,7 +131,7 @@
                 if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
             }
             draw() {
-                ctx.fillStyle = 'rgba(255, 119, 198, 0.3)'; // Color synthwave
+                ctx.fillStyle = '#0a174e'; // Azul más oscuro sin opacidad
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -157,8 +157,8 @@
 
                     if (distance < connectionDistance) {
                         opacityValue = 1 - (distance / connectionDistance);
-                        ctx.strokeStyle = `rgba(255, 119, 198, ${opacityValue * 0.2})`;
-                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = `rgba(0, 191, 255, ${opacityValue * 0.7})`;
+                        ctx.lineWidth = 2;
                         ctx.beginPath();
                         ctx.moveTo(particles[a].x, particles[a].y);
                         ctx.lineTo(particles[b].x, particles[b].y);

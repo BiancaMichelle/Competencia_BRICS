@@ -1,0 +1,97 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Registrar Sala{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/output.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-xl mx-auto">
+        <!-- Card Principal -->
+        <div class="bg-white shadow-xl rounded-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-indigo-600 to-blue-800 px-6 py-8">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 014-4h2a4 4 0 014 4v2M9 17v2a2 2 0 002 2h2a2 2 0 002-2v-2M9 17H7a2 2 0 01-2-2v-2a4 4 0 014-4h2a4 4 0 014 4v2a2 2 0 01-2 2h-2"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <h1 class="text-2xl font-bold text-white">Registrar Sala</h1>
+                        <p class="text-blue-100">Gestión de Salas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <div class="px-6 py-8">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="{{ form.nombre.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                {{ form.nombre.label }}
+                            </label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.nombre.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="{{ form.capacidad.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                {{ form.capacidad.label }}
+                            </label>
+                            {{ form.capacidad }}
+                            {% if form.capacidad.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.capacidad.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
+                        <button type="submit"
+                                class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-800 text-white px-6 py-3 rounded-lg font-medium hover:from-indigo-700 hover:to-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transform transition-all duration-200 hover:scale-[1.02] flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                            Registrar Sala
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Listado de Salas -->
+        <div class="mt-10">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Listado de Salas</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white shadow rounded-lg">
+                    <thead class="bg-gradient-to-r from-indigo-600 to-blue-800 text-white">
+                        <tr>
+                            <th class="py-3 px-4 text-left">Nombre de Sala</th>
+                            <th class="py-3 px-4 text-left">Capacidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sala in salas %}
+                        <tr class="border-b last:border-b-0">
+                            <td class="py-2 px-4">{{ sala.nombre }}</td>
+                            <td class="py-2 px-4">{{ sala.capacidad }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="py-4 px-4 text-center text-gray-500">No hay salas registradas</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
