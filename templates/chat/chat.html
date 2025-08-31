@@ -215,7 +215,7 @@
             </div>
 
             <!-- Mostrar mensajes del formulario Django (si existe) -->
-            {% if user_message %}
+            {% for msg in history %}
             <div class="chat chat-end mb-4">
                 <div class="chat-image avatar">
                     <div class="w-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
@@ -225,14 +225,12 @@
                     </div>
                 </div>
                 <div class="chat-header text-sm text-gray-600 mb-1">
-                    You
-                    <time class="text-xs opacity-50 ml-2">{{ "now"|date:"H:i" }}</time>
+                    Tú
+                    <time class="text-xs opacity-50 ml-2">{{ msg.timestamp|date:"H:i" }}</time>
                 </div>
-                <div class="chat-bubble chat-bubble-primary">{{ user_message }}</div>
+                <div class="chat-bubble chat-bubble-primary">{{ msg.user_message }}</div>
             </div>
-            {% endif %}
 
-            {% if ai_response %}
             <div class="chat chat-start mb-4">
                 <div class="chat-image avatar">
                     <div class="w-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
@@ -242,12 +240,12 @@
                     </div>
                 </div>
                 <div class="chat-header text-sm text-gray-600 mb-1">
-                    Medical AI
-                    <time class="text-xs opacity-50 ml-2">{{ "now"|date:"H:i" }}</time>
+                    IA Médica
+                    <time class="text-xs opacity-50 ml-2">{{ msg.timestamp|date:"H:i" }}</time>
                 </div>
-                <div class="chat-bubble chat-bubble-accent">{{ ai_response }}</div>
+                <div class="chat-bubble chat-bubble-accent">{{ msg.ai_response }}</div>
             </div>
-            {% endif %}
+        {% endfor %}
 
             {% if error %}
             <div class="alert alert-error mb-4">
