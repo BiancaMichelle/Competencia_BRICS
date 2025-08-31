@@ -6,10 +6,18 @@ asgiref==3.8.1
 pytz==2024.1
 sqlparse==0.5.0
 
+# Base de datos PostgreSQL
+psycopg==2.9.9
+dj-database-url==2.1.0
+
+# Servidor WSGI para producción
+gunicorn==21.2.0
+
 # Utilidades de desarrollo
 autopep8==1.5.7
 pycodestyle==2.7.0
 toml==0.10.2
+werkzeug==3.0.1
 
 # Para requests HTTP (si se necesita)
 requests==2.31.0

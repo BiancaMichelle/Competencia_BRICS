@@ -15,7 +15,7 @@
             </p>
             {% if user.is_authenticated %}
                 <div class="space-y-4">
-                    <p class="text-lg">¡Hi, <span class="font-semibold text-primary">{{ user.username }}</span>!</p>
+                    <p class="text-lg">¡Hi, <span class="font-semibold text-primary">{{ user.first_name }}</span>!</p>
                     <div class="flex gap-4 justify-center">
                         {% if user.profesional %}
                             <a href="{% url 'users:panel_profesional' %}" class="btn btn-secondary">Professional Panel</a>

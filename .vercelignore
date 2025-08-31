@@ -1,0 +1,47 @@
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Archivos de desarrollo
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Base de datos local
+db.sqlite3
+*.db
+
+# Logs
+*.log
+logs/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Node modules (si no se usan)
+node_modules/
+npm-debug.log*
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Documentación temporal
+*.tmp
+*.bak
+
+# Archivos de configuración local
+setup.bat
+setup.sh
+setup.py

@@ -100,12 +100,12 @@ class BuscarPacienteForm(forms.Form):
     cedula = forms.CharField(
         max_length=20,
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Buscar por cédula'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Search by IC'})
     )
     nombre = forms.CharField(
         max_length=100,
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Buscar por nombre'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Search by name'})
     )
 
 

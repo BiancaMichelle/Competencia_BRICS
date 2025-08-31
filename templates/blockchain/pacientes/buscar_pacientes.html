@@ -1,16 +1,16 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% block title %}Buscar pacientes{% endblock %}
+{% block title %}Search Patients{% endblock %}
 
 {% block content %}
 
         <div class="bg-white p-8 rounded-2xl shadow-lg">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">Buscar Pacientes</h1>
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Search Patients</h1>
             <p class="text-gray-600 mb-8">
-                Busca pacientes por cédula o nombre para acceder a su información médica.
+                Search for patients by ID or name to access their medical information.
             </p>
 
-            <!-- Formulario de Búsqueda -->
+            <!-- Search Form -->
             <form method="get" class="mb-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
@@ -27,15 +27,15 @@
                     </div>
                 </div>
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300">
-                    Buscar
+                    Search
                 </button>
             </form>
 
-            <!-- Resultados de Búsqueda -->
+            <!-- Search Results -->
             {% if pacientes %}
                 <div class="border-t border-gray-200 pt-6">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">
-                        Resultados de la búsqueda ({{ pacientes|length }} encontrado{{ pacientes|length|pluralize }})
+                        Search Results ({{ pacientes|length }} found)
                     </h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -45,22 +45,22 @@
                                     <h3 class="text-lg font-bold text-gray-800">
                                         {{ paciente.user.first_name }} {{ paciente.user.last_name }}
                                     </h3>
-                                    <p class="text-gray-600">C.I.: {{ paciente.cedula }}</p>
-                                    <p class="text-gray-600">Edad: {{ paciente.get_edad }} años</p>
-                                    <p class="text-gray-600">Teléfono: {{ paciente.telefono }}</p>
+                                    <p class="text-gray-600">I.C.: {{ paciente.cedula }}</p>
+                                    <p class="text-gray-600">Age: {{ paciente.get_edad }} years old</p>
+                                    <p class="text-gray-600">Phone: {{ paciente.telefono }}</p>
                                 </div>
                                 
                                 <!-- Información médica básica -->
                                 <div class="mb-4 text-sm">
                                     {% if paciente.tipo_sangre %}
                                         <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs mr-2 mb-1">
-                                            Tipo: {{ paciente.tipo_sangre }}
+                                            Type: {{ paciente.tipo_sangre }}
                                         </span>
                                     {% endif %}
                                     
                                     {% if paciente.alergias.exists %}
                                         <span class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded text-xs mr-2 mb-1">
-                                            {{ paciente.alergias.count }} alergia{{ paciente.alergias.count|pluralize }}
+                                            {{ paciente.alergias.count }} alergy{{ paciente.alergias.count|pluralize }}
                                         </span>
                                     {% endif %}
                                     
@@ -73,7 +73,7 @@
                                 
                                 <a href="{% url 'users:perfil_paciente' paciente.id %}" 
                                    class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
-                                    Ver Perfil Completo
+                                    View Full Profile
                                 </a>
                             </div>
                         {% endfor %}
@@ -83,10 +83,10 @@
                 <div class="border-t border-gray-200 pt-6">
                     <div class="text-center py-8">
                         <div class="text-gray-400 text-6xl mb-4">🔍</div>
-                        <h3 class="text-lg font-semibold text-gray-600 mb-2">No se encontraron pacientes</h3>
+                        <h3 class="text-lg font-semibold text-gray-600 mb-2">Patients not found</h3>
                         <p class="text-gray-500">
-                            No hay pacientes que coincidan con los criterios de búsqueda.
-                            <br>Verifica la información e intenta nuevamente.
+                            There is no patient matching the search criteria.
+                            <br>Please check the information and try again.
                         </p>
                     </div>
                 </div>
@@ -94,9 +94,9 @@
                 <div class="border-t border-gray-200 pt-6">
                     <div class="text-center py-8">
                         <div class="text-gray-400 text-6xl mb-4">👥</div>
-                        <h3 class="text-lg font-semibold text-gray-600 mb-2">Busca un paciente</h3>
+                        <h3 class="text-lg font-semibold text-gray-600 mb-2">Search for a patient</h3>
                         <p class="text-gray-500">
-                            Utiliza el formulario de arriba para buscar pacientes por cédula o nombre.
+                            Use the form above to search for patients by ID or name.
                         </p>
                     </div>
                 </div>
