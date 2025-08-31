@@ -1,39 +1,39 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% block title %}Panel del Profesional{% endblock %}
+{% block title %}Professional Dashboard{% endblock %}
 {% block content %}
-<!-- Vista de Inicio del Profesional (visible por defecto) -->
+<!-- Professional Home View (visible by default) -->
 <div id="inicio-view" class="bg-white p-8 rounded-2xl shadow-lg">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Bienvenido, Dr/a. {{ profesional.user.first_name }} {{ profesional.user.last_name }}</h1>
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Welcome, Dr./Mrs. {{ profesional.user.first_name }} {{ profesional.user.last_name }}</h1>
     <p class="text-gray-600 mb-8">
-        Especialidad: {{ profesional.get_especialidad_display }} | Matrícula: {{ profesional.matricula }}
+        Specialty: {{ profesional.get_especialidad_display }} | Registration: {{ profesional.matricula }}
     </p>
-    
-    <!-- Estadísticas Rápidas -->
+
+    <!-- Quick Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <!-- Tarjeta de Turnos de Hoy -->
+        <!-- Today's Appointments Card -->
         <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 shadow-md">
-            <h2 class="text-xl font-bold text-blue-800 mb-2">Turnos de Hoy</h2>
-            <p class="text-gray-700 text-lg"><span class="font-bold">{{ turnos_hoy|length }}</span> paciente{{ turnos_hoy|length|pluralize }}</p>
+            <h2 class="text-xl font-bold text-blue-800 mb-2">Today's Appointments</h2>
+            <p class="text-gray-700 text-lg"><span class="font-bold">{{ turnos_hoy|length }}</span> patient{{ turnos_hoy|length|pluralize }}</p>
         </div>
-        
-        <!-- Tarjeta de Próximos Turnos -->
+
+        <!-- Upcoming Appointments Card -->
         <div class="bg-green-50 p-6 rounded-xl border border-green-200 shadow-md">
-            <h2 class="text-xl font-bold text-green-800 mb-2">Próximos Turnos</h2>
-            <p class="text-gray-700 text-lg"><span class="font-bold">{{ turnos_proximos|length }}</span> agendado{{ turnos_proximos|length|pluralize }}</p>
+            <h2 class="text-xl font-bold text-green-800 mb-2">Upcoming Appointments</h2>
+            <p class="text-gray-700 text-lg"><span class="font-bold">{{ turnos_proximos|length }}</span> scheduled</p>
         </div>
-        
-        <!-- Tarjeta de Pacientes Recientes -->
+
+        <!-- Recent Patients Card -->
         <div class="bg-purple-50 p-6 rounded-xl border border-purple-200 shadow-md">
-            <h2 class="text-xl font-bold text-purple-800 mb-2">Pacientes Recientes</h2>
-            <p class="text-gray-700 text-lg"><span class="font-bold">{{ pacientes_recientes|length }}</span> en el último mes</p>
+            <h2 class="text-xl font-bold text-purple-800 mb-2">Recent Patients</h2>
+            <p class="text-gray-700 text-lg"><span class="font-bold">{{ pacientes_recientes|length }}</span> in the last month</p>
         </div>
     </div>
 
-    <!-- Turnos de Hoy - Detalle -->
+    <!-- Today's Appointments - Details -->
     {% if turnos_hoy %}
     <div class="mb-8">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Agenda de Hoy</h2>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Today's Appointments</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             {% for turno in turnos_hoy %}
                 <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
@@ -42,37 +42,34 @@
                         <span class="text-sm text-blue-600">{{ turno.fecha_hora|time:"H:i" }}</span>
                     </div>
                     <p class="text-gray-700 text-sm">{{ turno.motivo|truncatechars:50 }}</p>
-                    <p class="text-gray-600 text-xs mt-1">Tel: {{ turno.paciente.telefono }}</p>
+                    <p class="text-gray-600 text-xs mt-1">Phone: {{ turno.paciente.telefono }}</p>
                 </div>
             {% endfor %}
         </div>
     </div>
     {% endif %}
 
-    <!-- Accesos Rápidos -->
+    <!-- Quick Access -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Accesos Rápidos</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Access</h3>
             <div class="space-y-3">
                 <a href="{% url 'users:buscar_pacientes' %}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg transition-colors duration-300">
-                    Buscar Pacientes
+                    Search Patients
                 </a>
                 <a href="#" onclick="showView('turnos-view')" class="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-2 px-4 rounded-lg transition-colors duration-300">
-                    Ver Calendario
+                    View Calendar
                 </a>
                 <a href="{% url 'users:user_list' %}" onclick="showView('pacientes-view')" class="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center py-2 px-4 rounded-lg transition-colors duration-300">
-                    Lista de Pacientes
-                </a>
-                <a href="{% url 'users:blockchain_status' %}" class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white text-center py-2 px-4 rounded-lg transition-colors duration-300">
-                    Estado Blockchain
+                    Patient List
                 </a>
             </div>
         </div>
 
-        <!-- Próximos Turnos -->
+        <!-- Upcoming Appointments -->
         {% if turnos_proximos %}
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Próximos Turnos</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Upcoming Appointments</h3>
             <div class="space-y-2 max-h-48 overflow-y-auto">
                 {% for turno in turnos_proximos|slice:":5" %}
                     <div class="text-sm">
@@ -86,8 +83,8 @@
         </div>
         {% else %}
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Próximos Turnos</h3>
-            <p class="text-gray-500">No hay turnos programados</p>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Upcoming Appointments</h3>
+            <p class="text-gray-500">No upcoming appointments scheduled</p>
         </div>
         {% endif %}
     </div>

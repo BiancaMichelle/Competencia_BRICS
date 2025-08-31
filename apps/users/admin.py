@@ -83,9 +83,9 @@ class AccesoBlockchainAdmin(admin.ModelAdmin):
 
 
 # Configurar el sitio admin personalizado
-admin.site.site_header = "ARQA Medical System - Administración"
+admin.site.site_header = "ARQA Medical System - Admin"
 admin.site.site_title = "ARQA Admin"
-admin.site.index_title = "Panel de Administración"
+admin.site.index_title = "Dashboard Admin"
 
 # Personalizar la URL del index del admin
 class CustomAdminSite(admin.AdminSite):

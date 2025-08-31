@@ -9,7 +9,7 @@ class ChatForm(forms.Form):
         max_length=1000,
         widget=forms.TextInput(attrs={
             'class': 'form-control chat-input',
-            'placeholder': 'Escribe tu mensaje...',
+            'placeholder': 'Type your message...',
             'autocomplete': 'off',
             'id': 'messageInput'
         }),
@@ -22,9 +22,9 @@ class ChatForm(forms.Form):
         message = self.cleaned_data['message']
         
         if not message.strip():
-            raise forms.ValidationError('El mensaje no puede estar vacío.')
-        
+            raise forms.ValidationError('Message cannot be empty.')
+
         if len(message.strip()) < 1:
-            raise forms.ValidationError('El mensaje es demasiado corto.')
-            
+            raise forms.ValidationError('Message is too short.')
+
         return message.strip()

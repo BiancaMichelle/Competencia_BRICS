@@ -14,12 +14,12 @@ class ChatMessageAdmin(admin.ModelAdmin):
     
     def user_message_short(self, obj):
         return obj.user_message[:50] + '...' if len(obj.user_message) > 50 else obj.user_message
-    user_message_short.short_description = 'Mensaje del Usuario'
-    
+    user_message_short.short_description = 'User Message'
+
     def ai_response_short(self, obj):
         return obj.ai_response[:50] + '...' if len(obj.ai_response) > 50 else obj.ai_response
-    ai_response_short.short_description = 'Respuesta de IA'
-    
+    ai_response_short.short_description = 'AI Response'
+
     def conversation_length(self, obj):
         user_length = len(obj.user_message)
         ai_length = len(obj.ai_response)
@@ -37,17 +37,17 @@ class ChatMessageAdmin(admin.ModelAdmin):
             color,
             total
         )
-    conversation_length.short_description = 'Longitud Total'
-    
+    conversation_length.short_description = 'Total Length'
+
     fieldsets = (
-        ('Información del Usuario', {
+        ('User Information', {
             'fields': ('user', 'timestamp')
         }),
-        ('Conversación', {
+        ('Conversation', {
             'fields': ('user_message', 'ai_response'),
-            'description': 'Conversación completa entre el usuario y la IA'
+            'description': 'Full conversation between the user and the AI'
         }),
-        ('Metadatos', {
+        ('Metadata', {
             'fields': ('session_key',),
             'classes': ('collapse',),
         }),
@@ -65,5 +65,5 @@ class ChatMessageAdmin(admin.ModelAdmin):
         old_messages = ChatMessage.objects.filter(timestamp__lt=cutoff_date)
         count = old_messages.count()
         old_messages.delete()
-        self.message_user(request, f'Se eliminaron {count} mensajes antiguos (más de 30 días).')
-    delete_old_messages.short_description = 'Eliminar mensajes antiguos (>30 días)'
+        self.message_user(request, f'{count} old messages deleted (older than 30 days).')
+    delete_old_messages.short_description = 'Delete old messages (>30 days)'

@@ -19,7 +19,7 @@
 
                 {% if user.is_authenticated %}
                     <!-- Enlaces solo para usuarios autenticados -->
-                    {% if user.profesional or user.is_superuser %}
+                    {% if user.profesional or user.paciente or user.is_superuser %}
                         <a href="{% url 'chat:chat_view' %}" onclick="showView('chat-view')" id="nav-chat" class="text-blue-900 hover:text-blue-600 font-semibold transition-colors duration-300">AI Chat</a>
                     {% endif %}
                     {% if user.paciente %}
@@ -50,12 +50,6 @@
                             <a href="{% url 'users:registro_paciente' %}" class="block px-4 py-2 text-blue-900 hover:bg-blue-50 transition-colors duration-300">
                                 As a patient
                             </a>
-<<<<<<< HEAD
-=======
-                            <a href="{% url 'users:registro_profesional' %}" class="block px-4 py-2 text-blue-900 hover:bg-blue-50 transition-colors duration-300">
-                                As a professional
-                            </a>
->>>>>>> bdbbbdc72c9d4b8135b632734afccaeec140a264
                         </div>
                     </div>
                 {% endif %}

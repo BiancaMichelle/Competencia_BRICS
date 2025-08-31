@@ -189,7 +189,7 @@ class TratamientoForm(forms.ModelForm):
             }),
             'frecuencia': forms.TextInput(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'EX: Cada 8 horas, Diario'
+                'placeholder': 'EX: Twice a day, every 8 hours'
             }),
             'fecha_inicio': forms.DateInput(attrs={
                 'type': 'date',
@@ -202,7 +202,7 @@ class TratamientoForm(forms.ModelForm):
             'observaciones': forms.Textarea(attrs={
                 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
                 'rows': 2,
-                'placeholder': 'Observaciones adicionales'
+                'placeholder': 'Additional observations'
             }),
         }
         labels = {

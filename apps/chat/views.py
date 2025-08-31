@@ -17,23 +17,23 @@ def build_medical_history(paciente):
         return ""
     parts = []
     for a in paciente.alergias.all():
-        parts.append(f"Alergia: {a.sustancia}, Severidad: {a.severidad}, Diagnóstico: {a.fecha_diagnostico}")
+        parts.append(f"Alergy: {a.sustancia}, Severity: {a.severidad}, Diagnosis: {a.fecha_diagnostico}")
     for c in paciente.condiciones.all():
-        parts.append(f"Condición: {c.codigo}, Estado: {c.estado}, Diagnóstico: {c.fecha_diagnostico}")
+        parts.append(f"Condition: {c.codigo}, Status: {c.estado}, Diagnosis: {c.fecha_diagnostico}")
     for t in paciente.tratamientos.all():
-        med = t.medicamento.nombre if getattr(t, "medicamento", None) else "Sin medicamento"
-        parts.append(f"Tratamiento: {t.descripcion}, Medicamento: {med}, Desde: {t.fecha_inicio}, Hasta: {t.fecha_fin}")
+        med = t.medicamento.nombre if getattr(t, "medicamento", None) else "No medication"
+        parts.append(f"Treatment: {t.descripcion}, Medication: {med}, From: {t.fecha_inicio}, Until: {t.fecha_fin}")
     for ant in paciente.antecedentes.all():
-        parts.append(f"Antecedente: {ant.tipo}, Descripción: {ant.descripcion}")
+        parts.append(f"Antecedent: {ant.tipo}, Description: {ant.descripcion}")
     for cir in paciente.cirugias.all():
-        parts.append(f"Cirugía: {cir.nombre_cirugia}, Fecha: {cir.fecha_cirugia}, Estado: {cir.estado}")
+        parts.append(f"Surgery: {cir.nombre_cirugia}, Date: {cir.fecha_cirugia}, Status: {cir.estado}")
     for p in paciente.pruebas.all():
-        parts.append(f"Prueba: {p.nombre_prueba}, Fecha: {p.fecha_realizacion}, Resultados: {p.resultados}")
+        parts.append(f"Test: {p.nombre_prueba}, Date: {p.fecha_realizacion}, Results: {p.resultados}")
     return "\n".join(parts)
 
 @login_required
 def chat_view(request):
-    """Vista principal del chat"""
+    """Main chat view"""
     form = ChatForm()
     history = ChatMessage.objects.filter(user=request.user).order_by('timestamp')
     context = {
@@ -55,39 +55,39 @@ def chat_view(request):
                 paciente = None
             except Exception:
                 tb = traceback.format_exc()
-                context.update({'form': form, 'error': f'Error leyendo Paciente: {tb[:1000]}'})
+                context.update({'form': form, 'error': f'Error reading Patient: {tb[:1000]}'})
                 return render(request, 'chat/chat.html', context)
 
             medical_history = build_medical_history(paciente)
 
             system_prompt = f"""
-            Eres un asistente virtual de inteligencia artificial especializado en medicina.
+            You are a virtual assistant specialized in medicine.
 
-            Historial clínico del usuario:
-            {medical_history if medical_history else "No hay datos clínicos registrados."}
+            Patient's medical history:
+            {medical_history if medical_history else "No clinical data registered."}
 
-            Tu objetivo principal es ayudar a los usuarios con información médica confiable,
-            guías de síntomas, tratamientos, prevención y educación sobre enfermedades.
-            Siempre debes actuar de forma profesional, clara, empática y comprensible
-            para personas sin formación médica.
+            Your main objective is to assist users with reliable medical information,
+            symptom guides, treatments, prevention, and education about diseases.
+            You must always act professionally, clearly, empathetically, and understandably
+            for people without medical training.
 
-            Reglas y estilo de respuesta:
-            1. Usa un lenguaje sencillo, evitando tecnicismos complicados cuando sea posible.
-            2. Proporciona información basada en evidencia, pero recuerda aclarar que no sustituyes la consulta médica profesional.
-            3. Cuando sea posible, ofrece pasos generales de prevención, manejo o consejos de bienestar.
-            4. Si el usuario describe síntomas, haz preguntas aclaratorias antes de dar sugerencias.
-            5. Nunca emitas diagnósticos definitivos; enfócate en orientación y educación.
-            6. Responde de forma cordial, amable y empática.
-            7. Mantén cada respuesta clara y estructurada: introduce la idea principal, luego detalles, y concluye con recomendaciones o próximos pasos.
-            8. Si no conoces la respuesta, admítelo y sugiere consultar a un profesional de la salud.
+            Rules and response style:
+            1. Use simple language, avoiding complicated technical terms when possible.
+            2. Provide evidence-based information, but remember to clarify that you do not replace professional medical consultation.
+            3. When possible, offer general steps for prevention, management, or wellness advice.
+            4. If the user describes symptoms, ask clarifying questions before giving suggestions.
+            5. Never issue definitive diagnoses; focus on guidance and education.
+            6. Respond in a cordial, kind, and empathetic manner.
+            7. Keep each response clear and structured: introduce the main idea, then details, and conclude with recommendations or next steps.
+            8. If you don't know the answer, admit it and suggest consulting a healthcare professional.
 
-            Formato de las respuestas:
-            - Saludos: cortos y amables.
-            - Información: clara, estructurada y concisa.
-            - Precaución: siempre indica consultar a un médico si es necesario.
-            - Referencias: menciona fuentes confiables si aplica (OMS, CDC, instituciones médicas reconocidas).
+            Response format:
+            - Greetings: short and friendly.
+            - Information: clear, structured, and concise.
+            - Caution: always indicate to consult a doctor if necessary.
+            - References: mention reliable sources if applicable (WHO, CDC, recognized medical institutions).
 
-            Eres una IA asistente médica responsable y confiable, orientada a ayudar sin reemplazar el juicio de un profesional de salud.
+            You are a responsible and reliable medical assistant AI, aimed at helping without replacing the judgment of a health professional.
             """
 
             try:
@@ -126,18 +126,18 @@ def chat_view(request):
                 else:
                     context.update({
                         'form': form,
-                        'error': f'Error en el servicio de IA: {response.status_code}'
+                        'error': f'Error in IA service: {response.status_code}'
                     })
                     
             except requests.exceptions.ConnectionError:
                 context.update({
                     'form': form,
-                    'error': 'No se puede conectar con Ollama. Asegúrate de que esté ejecutándose.'
+                    'error': 'Cannot connect to Ollama. Make sure it is running.'
                 })
             except requests.exceptions.Timeout:
                 context.update({
                     'form': form,
-                    'error': 'Tiempo de espera agotado. Intenta de nuevo.'
+                    'error': 'Request timed out. Please try again.'
                 })
             except Exception as e:
                 context.update({
@@ -166,13 +166,13 @@ def send_message(request):
         except json.JSONDecodeError:
             tb = traceback.format_exc()
             print("JSONDecodeError:\n", tb)
-            return JsonResponse({'error': 'JSON inválido', 'traceback': tb[:2000]}, status=400)
+            return JsonResponse({'error': 'Invalid JSON', 'traceback': tb[:2000]}, status=400)
 
         message = data.get('message', '').strip()
         if not message:
-            return JsonResponse({'error': 'Mensaje vacío'}, status=400)
+            return JsonResponse({'error': 'Empty message'}, status=400)
         if len(message) > 1000:
-            return JsonResponse({'error': 'Mensaje demasiado largo'}, status=400)
+            return JsonResponse({'error': 'Message too long'}, status=400)
 
         # Obtener paciente
         try:
@@ -181,30 +181,30 @@ def send_message(request):
             paciente = None
         except Exception:
             tb = traceback.format_exc()
-            print("Error al obtener Paciente:\n", tb)
-            return JsonResponse({'error': 'Error leyendo Paciente', 'traceback': tb[:2000]}, status=500)
+            print("Error getting Pacient:\n", tb)
+            return JsonResponse({'error': 'Error reading Pacient', 'traceback': tb[:2000]}, status=500)
 
         # Construir historial
         try:
             medical_history = build_medical_history(paciente)
         except Exception:
             tb = traceback.format_exc()
-            print("Error construyendo medical_history:\n", tb)
-            return JsonResponse({'error': 'Error construyendo medical_history', 'traceback': tb[:2000]}, status=500)
+            print("Error building medical_history:\n", tb)
+            return JsonResponse({'error': 'Error building medical_history', 'traceback': tb[:2000]}, status=500)
 
         print("Medical history preview:", medical_history[:500])
 
         # Preparar prompt
         # instrucción clara
         system_instruction = (
-            "Eres un asistente virtual médico. En tus respuestas debes usar la información del 'Historial clínico del usuario' "
-            "que se proporciona abajo para responder las preguntas. "
-            "No digas que no tienes acceso a los datos; en cambio usa y cita el historial entregado. "
-            "Responde con claridad, cita los datos relevantes y recomienda consultar un profesional si es necesario."
+            "You are a virtual medical assistant. In your responses, you must use the information from the 'User's medical history' "
+            "provided below to answer questions. "
+            "Do not say you do not have access to the data; instead, use and cite the provided history. "
+            "Respond clearly, cite relevant data, and recommend consulting a professional if necessary."
         )
 
         # pon el historial COMO mensaje separado (evita ambigüedades)
-        medical_history_msg = f"Historial clínico del usuario:\n{medical_history if medical_history else 'No hay datos clínicos registrados.'}"
+        medical_history_msg = f"Clinical medical history of the user:\n{medical_history if medical_history else 'No clinical data registered.'}"
 
         payload = {
             "model": "llama3.2:1b",
@@ -217,9 +217,9 @@ def send_message(request):
         }
 
         system_prompt = f"""
-        Eres un asistente virtual de inteligencia artificial especializado en medicina.
+        you are a virtual medical assistant.
 
-        Historial clínico del usuario:
+        Clinical medical history of the user:
         {medical_history}
 
         (Coloca aquí el resto de tu prompt y reglas de estilo...)
@@ -244,19 +244,19 @@ def send_message(request):
             )
         except Exception:
             tb = traceback.format_exc()
-            print("Error llamando a Ollama (requests.post):\n", tb)
-            return JsonResponse({'error': 'Error conectando con servicio IA', 'traceback': tb[:2000]}, status=500)
+            print("Error calling Ollama (requests.post):\n", tb)
+            return JsonResponse({'error': 'Error connecting to AI service', 'traceback': tb[:2000]}, status=500)
 
         print(f"Ollama status: {getattr(response, 'status_code', 'no-response')}")
 
         # Manejo de respuesta de Ollama
         if response is None:
-            return JsonResponse({'error': 'Sin respuesta de servicio IA'}, status=500)
+            return JsonResponse({'error': 'Without response from AI service'}, status=500)
 
         if response.status_code != 200:
             body_text = getattr(response, 'text', '<no body>')
             print("Ollama returned non-200:", response.status_code, body_text[:1000])
-            return JsonResponse({'error': f'Error del servicio IA: {response.status_code}', 'body': body_text[:2000]}, status=500)
+            return JsonResponse({'error': f'Error from AI service: {response.status_code}', 'body': body_text[:2000]}, status=500)
 
         # después de response = requests.post(...)
         print("Ollama status:", getattr(response, "status_code", None))
@@ -267,8 +267,8 @@ def send_message(request):
             response_data = response.json()
         except Exception:
             tb = traceback.format_exc()
-            print("Error parseando JSON de Ollama:\n", tb)
-            return JsonResponse({'error': 'Respuesta IA no JSON', 'body_preview': response.text[:2000], 'traceback': tb[:2000]}, status=500)
+            print("Error parsing JSON from Ollama:\n", tb)
+            return JsonResponse({'error': 'AI response not JSON', 'body_preview': response.text[:2000], 'traceback': tb[:2000]}, status=500)
 
         ai_response = response_data.get('message', {}).get('content', '')
         print("AI response (preview):", ai_response[:1000])
@@ -279,8 +279,8 @@ def send_message(request):
         except Exception:
             tb = traceback.format_exc()
             body_text = getattr(response, 'text', '<no body>')
-            print("Error parseando JSON de la respuesta de Ollama:\n", tb)
-            return JsonResponse({'error': 'Respuesta IA no JSON', 'traceback': tb[:2000], 'body': body_text[:2000]}, status=500)
+            print("Error parsing JSON from Ollama:\n", tb)
+            return JsonResponse({'error': 'AI response not JSON', 'traceback': tb[:2000], 'body': body_text[:2000]}, status=500)
 
         ai_response = response_data.get('message', {}).get('content', '')
 
@@ -293,8 +293,8 @@ def send_message(request):
             )
         except Exception:
             tb = traceback.format_exc()
-            print("Error guardando ChatMessage:\n", tb)
-            return JsonResponse({'error': 'Error guardando mensaje', 'traceback': tb[:2000]}, status=500)
+            print("Error saving ChatMessage:\n", tb)
+            return JsonResponse({'error': 'Error saving message', 'traceback': tb[:2000]}, status=500)
 
         # DEV: devolvemos medical_history para verificar (quitar en prod)
         return JsonResponse({
@@ -307,8 +307,8 @@ def send_message(request):
     except Exception:
         tb = traceback.format_exc()
         print("UNHANDLED EXCEPTION:\n", tb)
-        return JsonResponse({'error': 'Excepción en servidor', 'traceback': tb[:3000]}, status=500)
-    
+        return JsonResponse({'error': 'Unhandled exception on server', 'traceback': tb[:3000]}, status=500)
+
 @login_required
 def get_chat_history(request):
     """Obtener historial del chat"""

@@ -34,7 +34,7 @@ class CamaForm(forms.ModelForm):
                 camas_existentes -= 1
             if camas_existentes >= capacidad:
                 raise forms.ValidationError(
-                    f"La sala {sala.nombre} ya tiene su capacidad máxima de {capacidad} camas."
+                    f"The {sala.nombre} has reached its maximum capacity of {capacidad} beds."
                 )
 
             # Cama única por sala
