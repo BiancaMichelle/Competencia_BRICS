@@ -68,23 +68,44 @@ def perfil_paciente(request, paciente_id=None):
             if not request.session.get(session_key, False):
                 if request.method == 'POST' and 'password' in request.POST:
                     password = request.POST['password']
-                    # Verificar usando el hash genesis del paciente
+                    # Verificar usando los últimos 8 dígitos del hash genesis del paciente
                     try:
                         genesis_hash = BlockchainHash.objects.filter(
                             paciente=paciente,
                             categoria='genesis'
                         ).first()
                         
-                        if genesis_hash and password == genesis_hash.hash_value:
+                        if not genesis_hash:
+                            messages.error(request, 'No se encontró el hash génesis para este paciente.')
+                            return redirect('users:user_list')
+                        
+                        if password == genesis_hash.hash_value[-8:]:
                             request.session[session_key] = True
                         else:
-                            messages.error(request, 'Hash génesis incorrecto.')
-                            return render(request, 'users/perfil_paciente_password.html', {'paciente': paciente})
+                            messages.error(request, 'Los últimos 8 dígitos del hash génesis son incorrectos.')
+                            return render(request, 'users/perfil_paciente_password.html', {
+                                'paciente': paciente,
+                                'hash_parcial': genesis_hash.hash_value[:-8]
+                            })
                     except Exception as e:
                         messages.error(request, f'Error al verificar hash: {str(e)}')
-                        return render(request, 'users/perfil_paciente_password.html', {'paciente': paciente})
+                        return render(request, 'users/perfil_paciente_password.html', {
+                            'paciente': paciente,
+                            'hash_parcial': genesis_hash.hash_value[:-8] if genesis_hash else ''
+                        })
                 else:
-                    return render(request, 'users/perfil_paciente_password.html', {'paciente': paciente})
+                    # Mostrar el hash parcial
+                    genesis_hash = BlockchainHash.objects.filter(
+                        paciente=paciente,
+                        categoria='genesis'
+                    ).first()
+                    if not genesis_hash:
+                        messages.error(request, 'No se encontró el hash génesis para este paciente.')
+                        return redirect('users:user_list')
+                    return render(request, 'users/perfil_paciente_password.html', {
+                        'paciente': paciente,
+                        'hash_parcial': genesis_hash.hash_value[:-8]
+                    })
         es_propio_perfil = bool(is_owner)
     else:
         # El paciente está viendo su propio perfil
